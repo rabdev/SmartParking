@@ -8,6 +8,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import hu.bitnet.smartparking.R;
@@ -30,6 +31,31 @@ public class Home extends Fragment {
         View home = inflater.inflate(R.layout.fragment_home, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Find a parking");
+
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
+        imageView.setImageResource(R.drawable.ic_account);
+        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        imageView1.setImageResource(R.drawable.ic_history);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Login login = new Login();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, login, login.getTag())
+                        .commit();
+            }
+        });
+        imageView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Registration registration = new Registration();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, registration, registration.getTag())
+                        .commit();
+            }
+        });
 
         AppCompatButton map = (AppCompatButton) home.findViewById(R.id.btn_map);
         map.setOnClickListener(new View.OnClickListener() {
