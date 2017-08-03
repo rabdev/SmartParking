@@ -3,6 +3,8 @@ package hu.bitnet.smartparking.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,20 @@ public class Home extends Fragment {
         View home = inflater.inflate(R.layout.fragment_home, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Find a parking");
+
+        AppCompatButton map = (AppCompatButton) home.findViewById(R.id.btn_map);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map map1 = new Map();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, map1, map1.getTag())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         return home;
     }
 

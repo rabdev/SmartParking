@@ -1,13 +1,18 @@
 package hu.bitnet.smartparking;
 
+import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenu;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
+import android.view.MenuItem;
 import android.view.View;
 
 import hu.bitnet.smartparking.Fragments.Home;
+import hu.bitnet.smartparking.Fragments.Map;
 import hu.bitnet.smartparking.Fragments.Profile;
 import hu.bitnet.smartparking.Fragments.Settings;
 
@@ -18,45 +23,49 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View bottomNavigationMenu = findViewById(R.id.bottom_navbar);
-        BottomNavigationItemView parking = (BottomNavigationItemView) findViewById(R.id.action_parking);
-        BottomNavigationItemView history = (BottomNavigationItemView) findViewById(R.id.action_history);
-        BottomNavigationItemView profile = (BottomNavigationItemView) findViewById(R.id.action_profile);
-        BottomNavigationItemView settings = (BottomNavigationItemView) findViewById(R.id.action_settings);
+        final BottomNavigationItemView parking = (BottomNavigationItemView) findViewById(R.id.action_parking);
+        final BottomNavigationItemView history = (BottomNavigationItemView) findViewById(R.id.action_history);
+        final BottomNavigationItemView profile = (BottomNavigationItemView) findViewById(R.id.action_profile);
+        final BottomNavigationItemView settings = (BottomNavigationItemView) findViewById(R.id.action_settings);
 
-        parking.setOnClickListener(new View.OnClickListener() {
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navbar);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Home home = new Home();
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.frame, home, home.getTag())
-                        .addToBackStack(null)
-                        .commit();
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_parking:
+                        item.setChecked(item.getItemId()== 0);
+                        Home home = new Home();
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.frame, home, home.getTag())
+                                .addToBackStack(null)
+                                .commit();
+                        break;
+                    case R.id.action_profile:
+                        item.setChecked(item.getItemId()== 2);
+                        Profile profile1 = new Profile();
+                        FragmentManager fragmentManager1 = getSupportFragmentManager();
+                        fragmentManager1.beginTransaction()
+                                .replace(R.id.frame, profile1, profile1.getTag())
+                                .commit();
+                        break;
+                    case R.id.action_settings:
+                        item.setChecked(item.getItemId()== 3);
+                        Settings settings1 = new Settings();
+                        FragmentManager fragmentManager2 = getSupportFragmentManager();
+                        fragmentManager2.beginTransaction()
+                                .replace(R.id.frame, settings1, settings1.getTag())
+                                .commit();
+                        break;
+                }
+
+                return false;
             }
         });
 
-        profile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Profile profile1 = new Profile();
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.frame, profile1, profile1.getTag())
-                        .commit();
-            }
-        });
 
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Settings settings1 = new Settings();
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.frame, settings1, settings1.getTag())
-                        .commit();
-            }
-        });
+
 
 
     }

@@ -4,13 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hu.bitnet.smartparking.MainActivity">
+    tools:context="hu.bitnet.smartparking.MainActivity"
+    android:background="@drawable/background">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/colorAccent"
-        android:padding="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="0dp">
 
@@ -24,7 +28,10 @@
             android:id="@+id/appbar_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
         <ImageView
             android:id="@+id/appbar_right"
@@ -48,8 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/colorPrimaryDark"
-        app:itemIconTint="#F1F1F1"
-        app:itemTextColor="#F1F1F1"
+        app:itemIconTint="@drawable/bottom_nav_selected"
+        app:itemTextColor="@drawable/bottom_nav_selected"
         app:menu="@menu/menu_main" />
 
 </FrameLayout>
