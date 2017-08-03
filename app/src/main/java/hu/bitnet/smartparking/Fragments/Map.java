@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -65,6 +66,12 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         View map = inflater.inflate(R.layout.fragment_map, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Select parking spot");
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
+        imageView.setImageResource(R.drawable.ic_navigate);
+        imageView.setVisibility(View.VISIBLE);
+        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        imageView1.setImageResource(R.drawable.ic_back);
+        imageView1.setVisibility(View.VISIBLE);
 
         mapView = (MapView) map.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);

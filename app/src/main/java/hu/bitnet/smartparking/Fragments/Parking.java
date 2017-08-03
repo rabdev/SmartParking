@@ -14,10 +14,10 @@ import hu.bitnet.smartparking.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Settings extends Fragment {
+public class Parking extends Fragment {
 
 
-    public Settings() {
+    public Parking() {
         // Required empty public constructor
     }
 
@@ -26,14 +26,15 @@ public class Settings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View settings =inflater.inflate(R.layout.fragment_settings, container, false);
+        View parking =inflater.inflate(R.layout.fragment_parking, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
-        appbartext.setText("Settings");
+        appbartext.setText("Find a parking");
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
-        imageView.setVisibility(View.GONE);
+        imageView.setVisibility(View.VISIBLE);
+        imageView.setImageResource(R.drawable.ic_back);
         ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_right);
         imageView1.setVisibility(View.GONE);
-        return settings;
+        return parking;
     }
 
 }
