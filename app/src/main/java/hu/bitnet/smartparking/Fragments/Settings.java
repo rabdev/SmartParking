@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import hu.bitnet.smartparking.R;
 
@@ -24,7 +25,11 @@ public class Settings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View settings =inflater.inflate(R.layout.fragment_settings, container, false);
+        TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
+        appbartext.setText("Settings");
+
+        return settings;
     }
 
 }

@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="hu.bitnet.smartparking.MainActivity"
-    android:background="@drawable/background">
-
+    android:background="@drawable/background"
+    android:id="@+id/mainframe">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -16,7 +16,8 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteY="0dp"
+        android:id="@+id/appbar">
 
         <ImageView
             android:id="@+id/appbar_left"

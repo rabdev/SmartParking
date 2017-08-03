@@ -1,121 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_marginLeft="40dp"
-    android:layout_marginRight="40dp"
-    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="40dp"/>
-
-    <TextView
-        android:text="Smart Parking"
-        android:textSize="24sp"
-        android:textAlignment="center"
-        android:layout_marginBottom="24dp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="Welcome!"
-        android:textSize="22sp"
-        android:textAlignment="center"
-        android:layout_marginBottom="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="#3030300D"
+        android:orientation="vertical">
 
-        <EditText
-            android:hint="Email"
-            android:id="@+id/et_email"
-            android:inputType="textEmailAddress"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    </android.support.design.widget.TextInputLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="32dp"
+                android:src="@drawable/smartparking" />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
-        android:layout_marginBottom="24dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Welcome!"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-        <EditText
-            android:hint="Password"
-            android:id="@+id/et_password"
-            android:inputType="textPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:textColorHint="@color/colorPrimary">
 
-    </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/et_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btn_login"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:text="Sign in"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/tv_forgotpw"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/colorAccent"
-        android:text="Forgot your password?"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:textColorHint="@color/colorPrimary">
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="or"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btn_googlelogin"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:text="Sign in with Google"
-        android:textSize="12sp"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/tv_register"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/colorAccent"
-        android:text="Don't have an account? Sign up"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/colorAccent"
+                android:text="Sign in"
+                android:textColor="@android:color/white" />
 
-    <ProgressBar
-        style="@style/Base.Widget.AppCompat.ProgressBar"
-        android:id="@+id/progress"
-        android:visibility="invisible"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true" />
+            <TextView
+                android:id="@+id/tv_forgotpw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Forgot your password?"
+                android:textColor="@color/colorAccent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_weight="2"
+                    android:background="#BDBDBD" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_weight="1"
+                    android:text="or"
+                    android:textAlignment="center"
+                    android:textColor="#BDBDBD"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_weight="2"
+                    android:background="#BDBDBD" />
+            </LinearLayout>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_googlelogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/colorAccent"
+                android:text="Sign in with Google"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Don't have an account?"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_register"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:text="Sign up"
+                    android:textColor="@color/colorAccent" />
+
+            </LinearLayout>
+
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@style/Base.Widget.AppCompat.ProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:indeterminate="true"
+                android:visibility="invisible" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

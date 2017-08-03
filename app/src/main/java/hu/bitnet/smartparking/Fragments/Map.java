@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,6 +63,9 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View map = inflater.inflate(R.layout.fragment_map, container, false);
+        TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
+        appbartext.setText("Select parking spot");
+
         mapView = (MapView) map.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);

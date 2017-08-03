@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
@@ -29,19 +30,13 @@ public class MainActivity extends AppCompatActivity {
         preferences = getPreferences(0);
 
         /*if (preferences.getBoolean(Constants.IS_LOGGED_IN,true)){
-            item.setChecked(item.getItemId()== 0);
-            Home home = new Home();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                .replace(R.id.frame, home, home.getTag())
-                .addToBackStack(null)
-                .commit();
+            setContentView(R.layout.activity_main);
         } else {
 
             Login login = new Login();
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.frame, login, login.getTag())
+                    .replace(R.id.mainframe, login, login.getTag())
                     .commit();
         }*/
 
@@ -52,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
         final BottomNavigationItemView settings = (BottomNavigationItemView) findViewById(R.id.action_settings);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navbar);
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.appbar);
+        relativeLayout.setVisibility(View.GONE);
+        bottomNavigationView.setVisibility(View.GONE);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

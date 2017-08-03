@@ -42,7 +42,7 @@ public class Home extends Fragment {
                 Login login = new Login();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.frame, login, login.getTag())
+                        .replace(R.id.mainframe, login, login.getTag())
                         .commit();
             }
         });
@@ -52,7 +52,7 @@ public class Home extends Fragment {
                 Registration registration = new Registration();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.frame, registration, registration.getTag())
+                        .replace(R.id.mainframe, registration, registration.getTag())
                         .commit();
             }
         });

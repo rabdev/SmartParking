@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import hu.bitnet.smartparking.R;
 
@@ -25,6 +26,8 @@ public class Profile extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View profile = inflater.inflate(R.layout.fragment_profile, container, false);
+        TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
+        appbartext.setText("Profile");
         return profile;
     }
 
