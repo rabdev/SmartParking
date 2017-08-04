@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -13,7 +14,26 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import hu.bitnet.smartparking.Constants;
+import hu.bitnet.smartparking.Objects.Profile;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterface;
 import hu.bitnet.smartparking.ServerRequest;
@@ -68,7 +88,14 @@ public class Registration extends Fragment {
                 String first_name = reg_first_name.getText().toString();
                 String last_name = reg_last_name.getText().toString();
                 String phone = reg_phone.getText().toString();
-                loadJSON(email, password, first_name, last_name, phone);
+                java.util.Map<String,String> myMap1 = new HashMap<String, String>();
+                myMap1.put("email", email);
+                myMap1.put("password", password);
+                myMap1.put("firstName", first_name);
+                myMap1.put("lastName", last_name);
+                myMap1.put("phone", phone);
+                //loadJSON(email, password, first_name, last_name, phone);
+                new DownloadTask().execute("myMap");
             }
         });
 
@@ -82,7 +109,13 @@ public class Registration extends Fragment {
                 .build();
         RequestInterface requestInterface = retrofit.create(RequestInterface.class);
         ServerRequest request = new ServerRequest();
-        request.setEmail(email);
+        Profile profile = new Profile();
+        profile.setEmail(email);
+        profile.setPassword(password);
+        profile.setFirstName(first_name);
+        profile.setLastName(last_name);
+        profile.setPhone(phone);
+        request.setProfile(profile);
         Log.d(TAG, "EMAIL: "+email);
         request.setPassword(password);
         request.setFirstName(first_name);
@@ -95,6 +128,8 @@ public class Registration extends Fragment {
             public void onResponse(Call<ServerResponse> call, retrofit2.Response<ServerResponse> response) {
                 ServerResponse resp = response.body();
                 Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), resp.getProfile().getSessionid(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -103,6 +138,92 @@ public class Registration extends Fragment {
             }
         });
 
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            //do your request in here so that you don't interrupt the UI thread
+            try {
+                return downloadContent(params[0]);
+            } catch (IOException e) {
+                return "Unable to retrieve data. URL may be invalid.";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            //Here you are done with the task
+            Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String downloadContent(String myurl) throws IOException {
+        InputStream is = null;
+        int length = 500;
+
+        try {
+            URL url = new URL(Constants.BASE_URL+"register");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("email", "a@b.hu"));
+            params.add(new BasicNameValuePair("firstName", "A"));
+            params.add(new BasicNameValuePair("lastName", "B"));
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write(getQuery(params));
+            writer.flush();
+            writer.close();
+            os.close();
+            conn.connect();
+            int response = conn.getResponseCode();
+            Log.d(TAG, "The response is: " + response);
+            is = conn.getInputStream();
+
+            // Convert the InputStream into a string
+            String contentAsString = convertInputStreamToString(is, length);
+            return contentAsString;
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+    }
+
+    public String convertInputStreamToString(InputStream stream, int length) throws IOException, UnsupportedEncodingException {
+        Reader reader = null;
+        reader = new InputStreamReader(stream, "UTF-8");
+        char[] buffer = new char[length];
+        reader.read(buffer);
+        return new String(buffer);
+    }
+
+    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException
+    {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for (NameValuePair pair : params)
+        {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
     }
 
 }

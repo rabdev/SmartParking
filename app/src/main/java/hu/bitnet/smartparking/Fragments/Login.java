@@ -15,9 +15,9 @@ import android.widget.Toast;
 
 import hu.bitnet.smartparking.Constants;
 import hu.bitnet.smartparking.R;
-import hu.bitnet.smartparking.RequestInterface;
-import hu.bitnet.smartparking.ServerRequest;
-import hu.bitnet.smartparking.ServerResponse;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
+import hu.bitnet.smartparking.ServerRequests.ServerRequestLogin;
+import hu.bitnet.smartparking.ServerResponses.ServerResponseLogin;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -71,22 +71,22 @@ public class Login extends Fragment {
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        RequestInterface requestInterface = retrofit.create(RequestInterface.class);
-        ServerRequest request = new ServerRequest();
-        request.setEmail(email);
-        request.setPassword(password);
-        Call<ServerResponse> response = requestInterface.operation(request);
-        response.enqueue(new Callback<ServerResponse>() {
+        RequestInterfaceLogin requestInterface = retrofit.create(RequestInterfaceLogin.class);
+        ServerRequestLogin request = new ServerRequestLogin();
+        request.setEmail("b@a.hu");
+        request.setPassword("1234");
+        Call<ServerResponseLogin> response = requestInterface.operation(request);
+        response.enqueue(new Callback<ServerResponseLogin>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, retrofit2.Response<ServerResponse> response) {
-                ServerResponse resp = response.body();
+            public void onResponse(Call<ServerResponseLogin> call, retrofit2.Response<ServerResponseLogin> response) {
+                ServerResponseLogin resp = response.body();
                 Toast.makeText(getContext(), "valamit azért kiírok", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
                 Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(Call<ServerResponseLogin> call, Throwable t) {
                 Toast.makeText(getContext(), "valamit azért kiírok itt", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "No response");
             }

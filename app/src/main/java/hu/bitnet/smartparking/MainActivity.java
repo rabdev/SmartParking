@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         relativeLayout.setVisibility(View.VISIBLE);
         bottomNavigationView.setVisibility(View.VISIBLE);
 
+
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     fragmentManager.beginTransaction()
                             //.replace(R.id.frame, home, home.getTag())
                             //.replace(R.id.frame, registration, registration.getTag())
-                            .replace(R.id.frame, login, login.getTag())
+                            .replace(R.id.mainframe, registration, registration.getTag())
+                            //.replace(R.id.frame, login, login.getTag())
                             .addToBackStack(null)
                             .commit();
                 } else {

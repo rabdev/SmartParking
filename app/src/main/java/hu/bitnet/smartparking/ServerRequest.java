@@ -1,5 +1,8 @@
 package hu.bitnet.smartparking;
 
+
+import hu.bitnet.smartparking.Objects.Profile;
+
 /**
  * Created by Attila on 2017.08.04..
  */
@@ -16,6 +19,7 @@ public class ServerRequest {
     private String longitude;
     private String address;
     private String id;
+    private Profile profile;
 
     public void setEmail(String email) {
         this.email = email;
@@ -36,5 +40,6 @@ public class ServerRequest {
     public void setAddress(String address) { this.address = address; }
     public void setId(String id) { this.id = id; }
     public String getEmail() { return email; }
+    public void setProfile(Profile profile) { this.profile = profile; }
 
 }
