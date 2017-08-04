@@ -1,22 +1,20 @@
 package hu.bitnet.smartparking;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenu;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
-import hu.bitnet.smartparking.Fragments.Map;
 import hu.bitnet.smartparking.Fragments.Profile;
+import hu.bitnet.smartparking.Fragments.Registration;
 import hu.bitnet.smartparking.Fragments.Settings;
 
 public class MainActivity extends AppCompatActivity {
@@ -57,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
                 if (item.getItemId()== R.id.action_parking){
                     item.setChecked(item.getItemId()== 0);
                     Home home = new Home();
+                    Registration registration = new Registration();
+                    Login login = new Login();
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.frame, home, home.getTag())
+                            //.replace(R.id.frame, home, home.getTag())
+                            //.replace(R.id.frame, registration, registration.getTag())
+                            .replace(R.id.frame, login, login.getTag())
                             .addToBackStack(null)
                             .commit();
                 } else {
