@@ -6,6 +6,6 @@ package hu.bitnet.smartparking;
 
 public class Constants {
 
-    public static final String BASE_URL = "http://smartparking.digitalwave.hu/app/";
+    public static final String SERVER_URL = "http://smartparking.digitalwave.hu/app/";
 
 }

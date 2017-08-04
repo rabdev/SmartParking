@@ -68,7 +68,7 @@ public class Login extends Fragment {
 
     public void loadJSON(String email, String password){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RequestInterfaceLogin requestInterface = retrofit.create(RequestInterfaceLogin.class);

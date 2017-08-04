@@ -33,13 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import hu.bitnet.smartparking.Constants;
-import hu.bitnet.smartparking.Objects.Profile;
 import hu.bitnet.smartparking.R;
-import hu.bitnet.smartparking.RequestInterface;
-import hu.bitnet.smartparking.ServerRequest;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceRegister;
 import hu.bitnet.smartparking.ServerResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -94,8 +93,8 @@ public class Registration extends Fragment {
                 myMap1.put("firstName", first_name);
                 myMap1.put("lastName", last_name);
                 myMap1.put("phone", phone);
-                //loadJSON(email, password, first_name, last_name, phone);
-                new DownloadTask().execute("myMap");
+                loadJSON(email, password, first_name, last_name, phone);
+                //new DownloadTask().execute("myMap");
             }
         });
 
@@ -104,11 +103,12 @@ public class Registration extends Fragment {
 
     public void loadJSON(String email, String password, String first_name, String last_name, String phone){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.SERVER_URL)
+                //.baseUrl("http://jasehn.eu/homokozo/SmartPark/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        RequestInterface requestInterface = retrofit.create(RequestInterface.class);
-        ServerRequest request = new ServerRequest();
+        RequestInterfaceRegister requestInterface = retrofit.create(RequestInterfaceRegister.class);
+        /*ServerRequest request = new ServerRequest();
         Profile profile = new Profile();
         profile.setEmail(email);
         profile.setPassword(password);
@@ -121,11 +121,11 @@ public class Registration extends Fragment {
         request.setFirstName(first_name);
         request.setLastName(last_name);
         request.setPhone(phone);
-        Toast.makeText(getContext(), request.getEmail(), Toast.LENGTH_SHORT).show();
-        Call<ServerResponse> response = requestInterface.operation(request);
+        Toast.makeText(getContext(), email, Toast.LENGTH_SHORT).show();*/
+        Call<ServerResponse> response = requestInterface.post(first_name, last_name, email, password, phone);
         response.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, retrofit2.Response<ServerResponse> response) {
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 ServerResponse resp = response.body();
                 Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getContext(), resp.getProfile().getSessionid(), Toast.LENGTH_SHORT).show();
@@ -164,7 +164,7 @@ public class Registration extends Fragment {
         int length = 500;
 
         try {
-            URL url = new URL(Constants.BASE_URL+"register");
+            URL url = new URL(Constants.SERVER_URL+"register");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
