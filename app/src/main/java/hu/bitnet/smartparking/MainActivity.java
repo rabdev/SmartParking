@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import hu.bitnet.smartparking.Fragments.History;
 import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
 import hu.bitnet.smartparking.Fragments.Profile;
@@ -46,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navbar);
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.appbar);
-        relativeLayout.setVisibility(View.GONE);
-        bottomNavigationView.setVisibility(View.GONE);
+        relativeLayout.setVisibility(View.VISIBLE);
+        bottomNavigationView.setVisibility(View.VISIBLE);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -66,22 +67,28 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                 } else {
                     switch (item.getItemId()) {
-                        /*case R.id.action_history:
+                        case R.id.action_history:
+                            item.setChecked(item.getItemId() == 1);
+                            History history1 = new History();
+                            FragmentManager fragmentManager1 = getSupportFragmentManager();
+                            fragmentManager1.beginTransaction()
+                                    .replace(R.id.frame, history1, history1.getTag())
+                                    .commit();
 
-                            break;*/
+                            break;
                         case R.id.action_profile:
                             item.setChecked(item.getItemId() == 2);
                             Profile profile1 = new Profile();
-                            FragmentManager fragmentManager1 = getSupportFragmentManager();
-                            fragmentManager1.beginTransaction()
+                            FragmentManager fragmentManager2 = getSupportFragmentManager();
+                            fragmentManager2.beginTransaction()
                                     .replace(R.id.frame, profile1, profile1.getTag())
                                     .commit();
                             break;
                         case R.id.action_settings:
                             item.setChecked(item.getItemId() == 3);
                             Settings settings1 = new Settings();
-                            FragmentManager fragmentManager2 = getSupportFragmentManager();
-                            fragmentManager2.beginTransaction()
+                            FragmentManager fragmentManager3 = getSupportFragmentManager();
+                            fragmentManager3.beginTransaction()
                                     .replace(R.id.frame, settings1, settings1.getTag())
                                     .commit();
                             break;

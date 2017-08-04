@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import hu.bitnet.smartparking.R;
@@ -28,6 +29,10 @@ public class Profile extends Fragment {
         View profile = inflater.inflate(R.layout.fragment_profile, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Profile");
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        imageView.setVisibility(View.GONE);
+        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_right);
+        imageView1.setVisibility(View.GONE);
         return profile;
     }
 

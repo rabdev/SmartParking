@@ -31,31 +31,10 @@ public class Home extends Fragment {
         View home = inflater.inflate(R.layout.fragment_home, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Find a parking");
-
-        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
-        imageView.setImageResource(R.drawable.ic_account);
-        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
-        imageView1.setImageResource(R.drawable.ic_history);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Login login = new Login();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.mainframe, login, login.getTag())
-                        .commit();
-            }
-        });
-        imageView1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Registration registration = new Registration();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.mainframe, registration, registration.getTag())
-                        .commit();
-            }
-        });
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        imageView.setVisibility(View.GONE);
+        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_right);
+        imageView1.setVisibility(View.GONE);
 
         AppCompatButton map = (AppCompatButton) home.findViewById(R.id.btn_map);
         map.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +44,19 @@ public class Home extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
                         .replace(R.id.frame, map1, map1.getTag())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        AppCompatButton search = (AppCompatButton) home.findViewById(R.id.btn_search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Search search1 = new Search();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, search1, search1.getTag())
                         .addToBackStack(null)
                         .commit();
             }
