@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/priceper"
+                android:id="@+id/history_priceper"
                 android:textColor="@color/colorAccent"
                 android:layout_alignParentLeft="true"
                 android:textSize="18sp"
@@ -33,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/price"
+                android:id="@+id/history_price"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_alignParentRight="true"
                 android:textSize="18sp"
@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/timestamp"
+                android:id="@+id/history_timestamp"
                 android:textColor="#455A64"
                 android:textSize="16sp"
                 android:layout_alignParentLeft="true"
@@ -54,10 +54,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/time"
+                android:id="@+id/history_time"
                 android:textColor="#455A64"
                 android:textSize="16sp"
-                android:layout_toRightOf="@+id/timestamp"
+                android:layout_toRightOf="@+id/history_timestamp"
                 android:text="(1 perc)"/>
         </RelativeLayout>
 

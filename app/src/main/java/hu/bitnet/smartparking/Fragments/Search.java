@@ -32,6 +32,12 @@ public class Search extends Fragment {
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
         imageView.setVisibility(View.VISIBLE);
         imageView.setImageResource(R.drawable.ic_back);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
         ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_right);
         imageView1.setVisibility(View.GONE);
         return search;

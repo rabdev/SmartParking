@@ -1,5 +1,7 @@
-package hu.bitnet.smartparking;
+package hu.bitnet.smartparking.RequestInterfaces;
 
+import hu.bitnet.smartparking.ServerRequests.ServerRequest;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

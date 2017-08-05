@@ -1,4 +1,4 @@
-package hu.bitnet.smartparking;
+package hu.bitnet.smartparking.ServerRequests;
 
 
 import hu.bitnet.smartparking.Objects.Profile;

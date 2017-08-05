@@ -1,4 +1,4 @@
-package hu.bitnet.smartparking;
+package hu.bitnet.smartparking.ServerResponses;
 
 import hu.bitnet.smartparking.Objects.Addresses;
 import hu.bitnet.smartparking.Objects.BLE;

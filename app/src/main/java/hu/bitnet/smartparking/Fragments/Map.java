@@ -72,6 +72,12 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
         imageView1.setImageResource(R.drawable.ic_back);
         imageView1.setVisibility(View.VISIBLE);
+        imageView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         mapView = (MapView) map.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);

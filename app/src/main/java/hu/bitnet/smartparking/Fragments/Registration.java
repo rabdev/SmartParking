@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
@@ -32,10 +34,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import hu.bitnet.smartparking.Constants;
+import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceRegister;
-import hu.bitnet.smartparking.ServerResponse;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,6 +68,19 @@ public class Registration extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View registration = inflater.inflate(R.layout.fragment_registration, container, false);
+        TextView tv_login = (TextView) registration.findViewById(R.id.tv_login);
+        tv_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Login login = new Login();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.mainframe, login, login.getTag())
+                        .commit();
+            }
+        });
+
+
         btn_register = (AppCompatButton)registration.findViewById(R.id.btn_register);
         reg_email = (EditText)registration.findViewById(R.id.reg_email);
         reg_password = (EditText)registration.findViewById(R.id.reg_password);
@@ -122,7 +137,7 @@ public class Registration extends Fragment {
         request.setLastName(last_name);
         request.setPhone(phone);
         Toast.makeText(getContext(), email, Toast.LENGTH_SHORT).show();*/
-        Call<ServerResponse> response = requestInterface.post(first_name, last_name, email, password, phone);
+        Call<ServerResponse> response= requestInterface.post(first_name, last_name, email, password, phone);
         response.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {

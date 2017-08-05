@@ -4,6 +4,7 @@ package hu.bitnet.smartparking.Fragments;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import hu.bitnet.smartparking.Constants;
+import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
 import hu.bitnet.smartparking.ServerRequests.ServerRequestLogin;
@@ -51,6 +53,18 @@ public class Login extends Fragment {
         relativeLayout.setVisibility(View.GONE);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navbar);
         bottomNavigationView.setVisibility(View.GONE);
+
+        TextView tv_register = (TextView) login.findViewById(R.id.tv_register);
+        tv_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Registration registration = new Registration();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.mainframe, registration, registration.getTag())
+                        .commit();
+            }
+        });
 
         btn_login.setOnClickListener(new View.OnClickListener()
         {
