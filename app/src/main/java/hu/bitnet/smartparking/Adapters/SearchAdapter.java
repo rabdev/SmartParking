@@ -34,8 +34,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         viewHolder.tv_address.setText(android.get(i).getAddress());
         viewHolder.tv_priceper.setText(android.get(i).getPrice());
-        viewHolder.tv_km.setText(android.get(i).getDistance());
-        viewHolder.tv_traffic.setText(android.get(i).getTime());
+        viewHolder.tv_km.setText(android.get(i).getDistance()+" km");
+        viewHolder.tv_traffic.setText(android.get(i).getTime()+" min without traffix");
     }
 
     @Override

@@ -33,10 +33,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(HistoryAdapter.ViewHolder viewHolder, int i) {
 
         /*viewHolder.tv_address.setText(android.get(i).getAddress());
-        viewHolder.tv_priceper.setText(android.get(i).getPriceper());
-        viewHolder.tv_price.setText(android.get(i).getPrice());
+        viewHolder.tv_priceper.setText(android.get(i).getPriceper()+" Ft/óra");
+        viewHolder.tv_price.setText(android.get(i).getPrice()+ " Ft");
         viewHolder.tv_timestamp.setText(android.get(i).getTimestamp());
-        viewHolder.tv_time.setText(android.get(i).getTime());*/
+        viewHolder.tv_time.setText("("+android.get(i).getTime()+ " perc)");*/
     }
 
     @Override

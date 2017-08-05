@@ -16,8 +16,7 @@
             android:id="@+id/history_address"
             android:textStyle="bold"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="18sp"
-            android:text="1112 Budapest, Meredek utca 32."/>
+            android:textSize="18sp"/>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,16 +27,14 @@
                 android:id="@+id/history_priceper"
                 android:textColor="@color/colorAccent"
                 android:layout_alignParentLeft="true"
-                android:textSize="18sp"
-                android:text="400 Ft/óra"/>
+                android:textSize="18sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/history_price"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_alignParentRight="true"
-                android:textSize="18sp"
-                android:text="1 Ft"/>
+                android:textSize="18sp"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -49,16 +46,14 @@
                 android:id="@+id/history_timestamp"
                 android:textColor="#455A64"
                 android:textSize="16sp"
-                android:layout_alignParentLeft="true"
-                android:text="2017.06.20. 12:14"/>
+                android:layout_alignParentLeft="true"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/history_time"
                 android:textColor="#455A64"
                 android:textSize="16sp"
-                android:layout_toRightOf="@+id/history_timestamp"
-                android:text="(1 perc)"/>
+                android:layout_toRightOf="@+id/history_timestamp"/>
         </RelativeLayout>
 
     </LinearLayout>
