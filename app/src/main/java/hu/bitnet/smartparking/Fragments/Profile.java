@@ -21,6 +21,7 @@ import hu.bitnet.smartparking.R;
 public class Profile extends Fragment {
 
     SharedPreferences pref;
+    TextView first_name, last_name, email, phone;
 
     public Profile() {
         // Required empty public constructor
@@ -54,6 +55,10 @@ public class Profile extends Fragment {
             }
         });
 
+        first_name= (TextView) profile.findViewById(R.id.profile_first_name);
+        last_name = (TextView) profile.findViewById(R.id.profile_last_name);
+        email = (TextView) profile.findViewById(R.id.profile_email);
+        phone = (TextView) profile.findViewById(R.id.profile_phone);
         return profile;
     }
 

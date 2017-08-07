@@ -48,7 +48,7 @@ public class Home extends Fragment {
                 editor.putBoolean(Constants.IS_LOGGED_IN,false);
                 editor.apply();
                 Intent intent = getActivity().getBaseContext().getPackageManager().getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 getActivity().finish();
                 startActivity(intent);
             }

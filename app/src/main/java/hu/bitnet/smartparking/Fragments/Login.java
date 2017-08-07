@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import hu.bitnet.smartparking.MainActivity;
-import hu.bitnet.smartparking.Objects.Constants;
+import hu.bitnet.smartparking.Objects.*;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
@@ -41,7 +42,6 @@ public class Login extends Fragment {
     public EditText et_email;
     public EditText et_password;
     SharedPreferences preferences;
-
     public Login() {
         // Required empty public constructor
     }
@@ -118,7 +118,7 @@ public class Login extends Fragment {
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
                     editor.apply();
                     Intent intent = new Intent(getContext(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
             }
