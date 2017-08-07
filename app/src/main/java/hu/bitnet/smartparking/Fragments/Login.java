@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
@@ -16,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import hu.bitnet.smartparking.MainActivity;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
@@ -113,12 +115,11 @@ public class Login extends Fragment {
                 if(resp.getProfile() != null){
                     Toast.makeText(getContext(), "Sikeres bejelentkezés", Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(Constants.IS_LOGGED_IN, true).commit();
-                    Home home = new Home();
-                    FragmentManager fragmentManager0 = getFragmentManager();
-                    fragmentManager0.beginTransaction()
-                            .replace(R.id.mainframe, home, "Home")
-                            .commit();
+                    editor.putBoolean(Constants.IS_LOGGED_IN, true);
+                    editor.apply();
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }
             }
 
