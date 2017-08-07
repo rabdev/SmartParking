@@ -96,7 +96,6 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/settings_distance"
                         android:textColor="@color/colorPrimary"
-                        android:text="2500 m"
                         android:textAlignment="textEnd"
                         android:textSize="16sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -110,7 +109,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/settings_smsbase"
-                        android:text="30-763"
                         android:textColor="@color/colorPrimary"
                         android:textAlignment="textEnd"
                         android:textSize="16sp" />
@@ -193,7 +191,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="24dp"
             android:textColor="@color/colorPrimary"
-            android:text="*Distance from selected parking place within the app will turn on the bLE communication."
+            android:text="*Distance from selected parking place within the app will turn on the BLE communication."
             android:textAlignment="center" />
 
         <TextView

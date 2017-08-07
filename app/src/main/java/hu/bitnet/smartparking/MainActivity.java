@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         preferences = getPreferences(0);
-        start();
+        //start();
 
         if (preferences.getBoolean(Constants.IS_LOGGED_IN, true)) {
             setContentView(R.layout.activity_main);
@@ -177,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
     public void start() {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(Constants.IS_LOGGED_IN, true);
-        editor.remove(Constants.LicensePlate);
         editor.apply();
     }
 }

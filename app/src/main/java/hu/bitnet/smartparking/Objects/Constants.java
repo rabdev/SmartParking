@@ -12,5 +12,7 @@ public class Constants {
 
     public static final String RSSI = "RSSI";
     public static final String LicensePlate="LicensePlate";
+    public static final String SettingsDistance ="Distance";
+    public static final String SMSBase="SMS Base";
 
 }

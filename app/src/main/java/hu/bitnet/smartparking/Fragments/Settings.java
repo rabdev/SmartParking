@@ -31,7 +31,7 @@ import hu.bitnet.smartparking.R;
 public class Settings extends Fragment {
 
     SharedPreferences pref;
-    EditText rssi, licenseplate, et_lp;
+    EditText rssi, licenseplate, et_lp, et_smsbase, et_distance;
     TextView tv_message;
     AlertDialog dialog;
     int prog;
@@ -60,14 +60,31 @@ public class Settings extends Fragment {
         seekBar.setMax(110);
         rssi = (EditText) settings.findViewById(R.id.rssi_settings);
         licenseplate = (EditText) settings.findViewById(R.id.settings_licenseplate);
+        et_distance = (EditText) settings.findViewById(R.id.settings_distance);
+        et_smsbase = (EditText) settings.findViewById(R.id.settings_smsbase);
+
         pref = this.getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
         String rssi1=pref.getString(Constants.RSSI,null);
         String licenseplate1 = pref.getString(Constants.LicensePlate,null);
+        final String distance = pref.getString(Constants.SettingsDistance,null);
+        String smsbase = pref.getString(Constants.SMSBase,null);
 
         if (licenseplate1==null|| licenseplate1.isEmpty()){
             showDialog();
         } else {
             licenseplate.setText(pref.getString(Constants.LicensePlate,""));
+        }
+
+        if (distance==null){
+            et_distance.setText("2500 m");
+        } else {
+            et_distance.setText(pref.getString(Constants.SettingsDistance,""));
+        }
+
+        if (smsbase==null) {
+            et_smsbase.setText("30-763");
+        } else {
+            et_smsbase.setText(pref.getString(Constants.SMSBase,""));
         }
 
         if (rssi1==null) {
@@ -104,14 +121,18 @@ public class Settings extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String rssi2,licenseplate2;
+                String rssi2,licenseplate2, smsbase2, distance2;
                 rssi2=rssi.getText().toString();
                 licenseplate2=licenseplate.getText().toString();
+                distance2=et_distance.getText().toString();
+                smsbase2=et_smsbase.getText().toString();
+
                 SharedPreferences.Editor editor= pref.edit();
                 editor.putString(Constants.RSSI,rssi2);
                 editor.putString(Constants.LicensePlate,licenseplate2);
+                editor.putString(Constants.SettingsDistance,distance2);
+                editor.putString(Constants.SMSBase,smsbase2);
                 editor.apply();
-                Snackbar.make(getView(), rssi2, Snackbar.LENGTH_LONG).show();
             }
         });
 
