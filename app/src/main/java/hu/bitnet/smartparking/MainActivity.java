@@ -15,7 +15,6 @@ import hu.bitnet.smartparking.Fragments.History;
 import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
 import hu.bitnet.smartparking.Fragments.Profile;
-import hu.bitnet.smartparking.Fragments.Registration;
 import hu.bitnet.smartparking.Fragments.Settings;
 import hu.bitnet.smartparking.Objects.Constants;
 

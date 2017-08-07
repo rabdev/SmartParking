@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -18,10 +19,12 @@ import android.widget.Toast;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
-import hu.bitnet.smartparking.ServerRequests.ServerRequestLogin;
-import hu.bitnet.smartparking.ServerResponses.ServerResponseLogin;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -35,6 +38,7 @@ public class Login extends Fragment {
     public AppCompatButton btn_login;
     public EditText et_email;
     public EditText et_password;
+    SharedPreferences preferences;
 
     public Login() {
         // Required empty public constructor
@@ -53,6 +57,7 @@ public class Login extends Fragment {
         relativeLayout.setVisibility(View.GONE);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navbar);
         bottomNavigationView.setVisibility(View.GONE);
+        preferences = getActivity().getPreferences(0);
 
         TextView tv_register = (TextView) login.findViewById(R.id.tv_register);
         tv_register.setOnClickListener(new View.OnClickListener() {
@@ -81,26 +86,44 @@ public class Login extends Fragment {
     }
 
     public void loadJSON(String email, String password){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
         Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
                 .baseUrl(Constants.SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RequestInterfaceLogin requestInterface = retrofit.create(RequestInterfaceLogin.class);
-        ServerRequestLogin request = new ServerRequestLogin();
-        request.setEmail("b@a.hu");
-        request.setPassword("1234");
-        Call<ServerResponseLogin> response = requestInterface.operation(request);
-        response.enqueue(new Callback<ServerResponseLogin>() {
+        Call<ServerResponse> response = requestInterface.post(email, password);
+        response.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponseLogin> call, retrofit2.Response<ServerResponseLogin> response) {
-                ServerResponseLogin resp = response.body();
-                Toast.makeText(getContext(), "valamit azért kiírok", Toast.LENGTH_SHORT).show();
-                Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
-                Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getProfile() != null){
+                    Toast.makeText(getContext(), "Sikeres bejelentkezés", Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean(Constants.IS_LOGGED_IN, true).commit();
+                    Home home = new Home();
+                    FragmentManager fragmentManager0 = getFragmentManager();
+                    fragmentManager0.beginTransaction()
+                            .replace(R.id.mainframe, home, "Home")
+                            .commit();
+                }
             }
 
             @Override
-            public void onFailure(Call<ServerResponseLogin> call, Throwable t) {
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "valamit azért kiírok itt", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "No response");
             }

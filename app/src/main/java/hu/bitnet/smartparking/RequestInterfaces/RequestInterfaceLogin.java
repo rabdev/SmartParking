@@ -1,9 +1,9 @@
 package hu.bitnet.smartparking.RequestInterfaces;
 
-import hu.bitnet.smartparking.ServerRequests.ServerRequestLogin;
-import hu.bitnet.smartparking.ServerResponses.ServerResponseLogin;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import retrofit2.Call;
-import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
@@ -13,6 +13,7 @@ import retrofit2.http.POST;
 public interface RequestInterfaceLogin {
 
     @POST("login")
-    Call<ServerResponseLogin> operation(@Body ServerRequestLogin request);
+    @FormUrlEncoded
+    Call<ServerResponse> post(@Field(encoded = true, value = "email") String email, @Field("password") String password);
 
 }
