@@ -15,6 +15,5 @@ public interface RequestInterfaceRegister {
     @POST("register")
     @FormUrlEncoded
     Call<ServerResponse> post(@Field(encoded = true, value = "email") String email, @Field("firstName") String first_name, @Field("lastName") String last_name, @Field("password") String password, @Field("phone") String phone);
-    //Call<ServerResponse> post(@Field(encoded = true, value = "email") String email, @Field("phone") String phone);
 
 }

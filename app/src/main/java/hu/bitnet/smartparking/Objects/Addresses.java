@@ -9,9 +9,11 @@ public class Addresses {
     private String name;
     private String latitude;
     private String longitude;
+    private String address;
 
     public String getName() { return name; }
     public String getLatitude() { return latitude; }
     public String getLongitude() { return longitude; }
+    public String getAddress() { return address; }
 
 }

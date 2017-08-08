@@ -8,18 +8,18 @@ public class Profile {
 
     private String firstName;
     private String lastName;
-    private String sessionid;
+    private String sessionId;
     private String email;
     private String phone;
     private String newsletter;
     private String userId;
     private String password;
 
-    private String getFirstName() { return firstName; }
-    private String getLastName() { return lastName; }
-    public String getSessionid() { return sessionid; }
-    private String getEmail() { return email; }
-    private String getPhone() { return phone; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getSessionId() { return sessionId; }
+    public String getEmail() { return email; }
+    public String getPhone() { return phone; }
     private String getNewsletter() { return newsletter; }
     private String getUserId() { return userId; }
 

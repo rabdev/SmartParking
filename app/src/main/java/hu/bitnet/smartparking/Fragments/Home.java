@@ -10,6 +10,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import hu.bitnet.smartparking.R;
 public class Home extends Fragment {
 
     SharedPreferences pref;
+    public String search_key_string;
 
     public Home() {
         // Required empty public constructor
@@ -71,7 +73,13 @@ public class Home extends Fragment {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditText search_key = (EditText)getActivity().findViewById(R.id.et_address);
+                search_key_string = search_key.getText().toString();
                 Search search1 = new Search();
+                pref = getActivity().getPreferences(0);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("search_key",search_key_string);
+                editor.apply();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
                         .replace(R.id.frame, search1, "Search")

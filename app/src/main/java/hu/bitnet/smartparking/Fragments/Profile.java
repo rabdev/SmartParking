@@ -56,9 +56,19 @@ public class Profile extends Fragment {
         });
 
         first_name= (TextView) profile.findViewById(R.id.profile_first_name);
+        SharedPreferences pref;
+        pref = getActivity().getPreferences(0);
+        String firstName = pref.getString("firstName", null);
+        first_name.setText(firstName);
         last_name = (TextView) profile.findViewById(R.id.profile_last_name);
+        String lastName = pref.getString("lastName", null);
+        last_name.setText(lastName);
         email = (TextView) profile.findViewById(R.id.profile_email);
+        String email_string = pref.getString("email", null);
+        email.setText(email_string);
         phone = (TextView) profile.findViewById(R.id.profile_phone);
+        String phone_string = pref.getString("phone", null);
+        phone.setText(phone_string);
         return profile;
     }
 

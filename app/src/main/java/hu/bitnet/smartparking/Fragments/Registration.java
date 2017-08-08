@@ -1,6 +1,8 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import hu.bitnet.smartparking.MainActivity;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceRegister;
@@ -40,6 +43,7 @@ public class Registration extends Fragment {
     public EditText reg_first_name;
     public EditText reg_last_name;
     public EditText reg_phone;
+    SharedPreferences preferences;
 
     public Registration() {
         // Required empty public constructor
@@ -112,12 +116,25 @@ public class Registration extends Fragment {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 ServerResponse resp = response.body();
-                Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_SHORT).show();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getProfile() != null){
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean(Constants.IS_LOGGED_IN, true);
+                    editor.apply();
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
             }
 
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "No response");
             }
         });

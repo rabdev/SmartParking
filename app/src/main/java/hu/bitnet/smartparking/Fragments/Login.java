@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import hu.bitnet.smartparking.MainActivity;
-import hu.bitnet.smartparking.Objects.*;
+import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
@@ -117,6 +116,16 @@ public class Login extends Fragment {
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
                     editor.apply();
+                    editor.putString("sessionId", resp.getProfile().getSessionId().toString());
+                    editor.apply();
+                    editor.putString("firstName", resp.getProfile().getFirstName().toString());
+                    editor.apply();
+                    editor.putString("lastName", resp.getProfile().getLastName().toString());
+                    editor.apply();
+                    editor.putString("email", resp.getProfile().getEmail().toString());
+                    editor.apply();
+                    editor.putString("phone", resp.getProfile().getPhone().toString());
+                    editor.apply();
                     Intent intent = new Intent(getContext(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
@@ -125,7 +134,7 @@ public class Login extends Fragment {
 
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "valamit azért kiírok itt", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "No response");
             }
         });
