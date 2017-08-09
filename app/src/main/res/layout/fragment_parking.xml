@@ -55,11 +55,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/address"
                 android:textAlignment="viewEnd"
                 android:layout_marginBottom="8dp"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:text="1112 Bdapest, Meredek utca 32"/>
+                android:text=""/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -91,12 +92,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/price"
                 android:textAlignment="viewEnd"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:text="200 Ft/óra"/>
+                android:text=""/>
         </LinearLayout>
     </LinearLayout>
 

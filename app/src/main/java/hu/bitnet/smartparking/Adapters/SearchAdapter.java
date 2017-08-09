@@ -17,6 +17,7 @@ import hu.bitnet.smartparking.R;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
     private ArrayList<Parking_places> android;
+    private static SearchAdapter.ClickListener clickListener;
 
     public SearchAdapter(ArrayList<Parking_places> android) {
         this.android = android;
@@ -43,7 +44,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return android.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView tv_km, tv_priceper, tv_address, tv_traffic;
 
         public ViewHolder(View view) {
@@ -54,6 +55,29 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             tv_km = (TextView) view.findViewById(R.id.search_km);
             tv_traffic = (TextView) view.findViewById(R.id.search_traffic);
 
+            view.setOnClickListener(this);
+            view.setOnLongClickListener(this);
+
         }
+
+        @Override
+        public void onClick(View v) {
+            clickListener.onItemClick(getAdapterPosition(), v);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            clickListener.onItemLongClick(getAdapterPosition(), v);
+            return false;
+        }
+    }
+
+    public void setOnItemClickListener(SearchAdapter.ClickListener clickListener) {
+        SearchAdapter.clickListener = clickListener;
+    }
+
+    public interface ClickListener {
+        void onItemClick(int position, View v);
+        void onItemLongClick(int position, View v);
     }
 }

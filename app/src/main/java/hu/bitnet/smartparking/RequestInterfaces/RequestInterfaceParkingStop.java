@@ -12,7 +12,7 @@ import retrofit2.http.POST;
 
 public interface RequestInterfaceParkingStop {
 
-    @POST("parking-stop")
+    @POST("parking_stop")
     @FormUrlEncoded
     Call<ServerResponse> post(@Field("sessionId") String sessionId, @Field("id") String id);
 

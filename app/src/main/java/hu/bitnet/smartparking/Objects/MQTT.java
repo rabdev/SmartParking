@@ -11,7 +11,7 @@ public class MQTT {
     private String topic;
 
     public String getHost() { return host; }
-    public String port() { return port; }
-    public String topic() { return topic; }
+    public String getPort() { return port; }
+    public String getTopic() { return topic; }
 
 }

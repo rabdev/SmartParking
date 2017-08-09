@@ -4,6 +4,7 @@ package hu.bitnet.smartparking.Fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.Objects.Parking_places;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceAutocomplete;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingSelect;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -108,6 +110,83 @@ public class Search extends Fragment {
                     data = new ArrayList<Parking_places>(Arrays.asList(resp.getAddress()));
                     mAdapter = new SearchAdapter(data);
                     mRecyclerView.setAdapter(mAdapter);
+
+                    mAdapter.setOnItemClickListener(new SearchAdapter.ClickListener(){
+                        @Override
+                        public void onItemClick(final int position, View v){
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("address", data.get(position).getAddress().toString());
+                            editor.apply();
+                            editor.putString("price", data.get(position).getPrice().toString());
+                            editor.apply();
+                            editor.putString("id", data.get(position).getId().toString());
+                            editor.apply();
+                            String id = data.get(position).getId().toString();
+                            String sessionId = pref.getString("sessionId", null);
+                            loadJSONSelect(sessionId, id);
+                            FragmentTransaction parking = getFragmentManager().beginTransaction();
+                            parking.replace(R.id.frame, new Parking()).addToBackStack(null);
+                            parking.commit();
+                        }
+
+                        @Override
+                        public void onItemLongClick(int position, View v) {
+                            Log.d(TAG, "onItemLongClick pos = " + position);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
+            }
+        });
+
+    }
+
+    public void loadJSONSelect(String sessionId, String id){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceParkingSelect requestInterface = retrofit.create(RequestInterfaceParkingSelect.class);
+        Call<ServerResponse> response= requestInterface.post(sessionId, id);
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getMQTT() != null){
+                    Toast.makeText(getContext(), resp.getMQTT().getHost().toString(), Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("host", resp.getMQTT().getHost());
+                    editor.apply();
+                    editor.putString("port", resp.getMQTT().getPort());
+                    editor.apply();
+                    editor.putString("topic", resp.getMQTT().getTopic());
+                    editor.apply();
+                }
+                if(resp.getBLE() != null){
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("service", resp.getBLE().getService());
+                    editor.apply();
+                    editor.putString("characteristic", resp.getBLE().getCharacteristic());
+                    editor.apply();
                 }
             }
 

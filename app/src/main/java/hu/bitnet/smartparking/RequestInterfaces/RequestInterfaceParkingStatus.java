@@ -12,8 +12,8 @@ import retrofit2.http.POST;
 
 public interface RequestInterfaceParkingStatus {
 
-    @POST("parking-status")
+    @POST("parking_status")
     @FormUrlEncoded
-    Call<ServerResponse> post(@Field("sessionId") String sessionId);
+    Call<ServerResponse> post(@Field("sessionId") String sessionId, @Field("id") String id);
 
 }
