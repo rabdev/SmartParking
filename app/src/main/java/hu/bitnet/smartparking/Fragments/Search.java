@@ -4,6 +4,7 @@ package hu.bitnet.smartparking.Fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -116,17 +117,21 @@ public class Search extends Fragment {
                         public void onItemClick(final int position, View v){
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putString("address", data.get(position).getAddress().toString());
-                            editor.apply();
                             editor.putString("price", data.get(position).getPrice().toString());
-                            editor.apply();
                             editor.putString("id", data.get(position).getId().toString());
+                            editor.putString("latitude", data.get(position).getLatitude().toString());
+                            editor.putString("longitude", data.get(position).getLongitude().toString());
+                            editor.putString("distance", data.get(position).getDistance().toString());
+                            editor.putString("time", data.get(position).getTime().toString());
                             editor.apply();
                             String id = data.get(position).getId().toString();
                             String sessionId = pref.getString("sessionId", null);
                             loadJSONSelect(sessionId, id);
-                            FragmentTransaction parking = getFragmentManager().beginTransaction();
-                            parking.replace(R.id.frame, new Parking()).addToBackStack(null);
-                            parking.commit();
+                            FragmentManager map = getActivity().getSupportFragmentManager();
+                            map.beginTransaction()
+                                    .replace(R.id.frame, new Map())
+                                    .addToBackStack(null)
+                                    .commit();
                         }
 
                         @Override
@@ -175,16 +180,13 @@ public class Search extends Fragment {
                     Toast.makeText(getContext(), resp.getMQTT().getHost().toString(), Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString("host", resp.getMQTT().getHost());
-                    editor.apply();
                     editor.putString("port", resp.getMQTT().getPort());
-                    editor.apply();
                     editor.putString("topic", resp.getMQTT().getTopic());
                     editor.apply();
                 }
                 if(resp.getBLE() != null){
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString("service", resp.getBLE().getService());
-                    editor.apply();
                     editor.putString("characteristic", resp.getBLE().getCharacteristic());
                     editor.apply();
                 }

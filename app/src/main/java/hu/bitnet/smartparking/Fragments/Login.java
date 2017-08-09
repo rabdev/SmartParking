@@ -115,15 +115,10 @@ public class Login extends Fragment {
                     Toast.makeText(getContext(), "Sikeres bejelentkezés", Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
-                    editor.apply();
                     editor.putString("sessionId", resp.getProfile().getSessionId().toString());
-                    editor.apply();
                     editor.putString("firstName", resp.getProfile().getFirstName().toString());
-                    editor.apply();
                     editor.putString("lastName", resp.getProfile().getLastName().toString());
-                    editor.apply();
                     editor.putString("email", resp.getProfile().getEmail().toString());
-                    editor.apply();
                     editor.putString("phone", resp.getProfile().getPhone().toString());
                     editor.apply();
                     Intent intent = new Intent(getContext(), MainActivity.class);

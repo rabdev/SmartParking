@@ -1,15 +1,18 @@
 package hu.bitnet.smartparking;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import hu.bitnet.smartparking.Fragments.History;
 import hu.bitnet.smartparking.Fragments.Home;
@@ -17,11 +20,23 @@ import hu.bitnet.smartparking.Fragments.Login;
 import hu.bitnet.smartparking.Fragments.Profile;
 import hu.bitnet.smartparking.Fragments.Settings;
 import hu.bitnet.smartparking.Objects.Constants;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceAutocomplete;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
     SharedPreferences preferences;
     BottomNavigationView bottomNavigationView;
+    Context context;
     int index;
 
     @Override
@@ -167,15 +182,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         index = getSupportFragmentManager().getBackStackEntryCount();
-        if (index == 0) {
-            super.onBackPressed();
-        } else {
-            bottomNavigationView.setSelectedItemId(R.id.action_parking);
+        Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
+        Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
+        if (status==null & finish==null){
+            if (index == 0) {
+                super.onBackPressed();
+            } else {
+                bottomNavigationView.setSelectedItemId(R.id.action_parking);
+            }
         }
+
     }
     public void start() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(Constants.IS_LOGGED_IN, true);
+        //editor.putString("sessionID","1");
+        editor.remove("latitude");
+        editor.remove("longitude");
         editor.apply();
     }
+
 }

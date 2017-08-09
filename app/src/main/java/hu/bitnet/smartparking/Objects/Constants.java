@@ -15,4 +15,7 @@ public class Constants {
     public static final String SettingsDistance ="Distance";
     public static final String SMSBase="SMS Base";
 
+    public static final String latitude="latitude";
+    public static final String longitude="longitude";
+
 }

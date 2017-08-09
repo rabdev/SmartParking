@@ -13,6 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/map_card"
         android:background="@color/colorPrimary"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
@@ -34,16 +35,14 @@
                 android:id="@+id/map_address"
                 android:textStyle="bold"
                 android:textSize="20sp"
-                android:textColor="@color/colorPrimaryDark"
-                android:text="Meredek utca 32."/>
+                android:textColor="@color/colorPrimaryDark"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:id="@+id/map_perprice"
                 android:textSize="18sp"
-                android:textColor="@color/colorAccent"
-                android:text="400 Ft/hours"/>
+                android:textColor="@color/colorAccent"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,8 +55,7 @@
                     android:id="@+id/map_distance"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:text="1.2 km"/>
+                    android:textColor="@color/colorPrimaryDark"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,8 +70,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/map_traffic"
                 android:textSize="14sp"
-                android:textColor="@color/colorPrimaryDark"
-                android:text="20 mins without traffic"/>
+                android:textColor="@color/colorPrimaryDark"/>
         </LinearLayout>
 
     </LinearLayout>

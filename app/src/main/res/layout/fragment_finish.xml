@@ -16,17 +16,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Parking..."
+            android:text="Parking stopped"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"
             android:textSize="28sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
         <LinearLayout
             android:layout_width="340dp"
             android:layout_height="340dp"
             android:background="@mipmap/pic_parking"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorAccent"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -54,7 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text=""
+                    android:text="1h 22min 30sec"
                     android:textAlignment="center"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="22sp"
@@ -85,15 +86,16 @@
 
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/stop_parking"
+            android:id="@+id/pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPurple"
+            android:background="@color/colorAccent"
             android:paddingBottom="16dp"
             android:paddingLeft="56dp"
             android:paddingRight="56dp"
             android:paddingTop="16dp"
-            android:text="Stop parking"
+            android:text="Pay now"
+            android:layout_marginTop="16dp"
             android:textColor="@color/colorPrimary" />
 
         <Switch

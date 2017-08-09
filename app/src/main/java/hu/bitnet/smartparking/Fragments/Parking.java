@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class Parking extends Fragment {
 
     SharedPreferences pref;
+    AppCompatButton startparking;
+    String sessionId, id;
+    View parking, stop;
 
     public Parking() {
         // Required empty public constructor
@@ -42,12 +47,12 @@ public class Parking extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View parking =inflater.inflate(R.layout.fragment_parking, container, false);
+        parking =inflater.inflate(R.layout.fragment_parking, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
-        appbartext.setText("Find a parking");
+        appbartext.setText("Start parking");
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
         imageView.setVisibility(View.VISIBLE);
         imageView.setImageResource(R.drawable.ic_back);
@@ -58,10 +63,19 @@ public class Parking extends Fragment {
         Switch switch1 = (Switch)parking.findViewById(R.id.switch1);
 
         pref = getActivity().getPreferences(0);
-        final String sessionId = pref.getString("sessionId", null);
-        final String id = pref.getString("id", null);
+        sessionId = pref.getString("sessionId", null);
+        id = pref.getString("id", null);
 
-        switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        startparking= (AppCompatButton) parking.findViewById(R.id.start_parking);
+        startparking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadJSONStart(sessionId, id);
+
+            }
+        });
+
+        /*switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked == true){
                     loadJSONStart(sessionId, id);
@@ -70,7 +84,7 @@ public class Parking extends Fragment {
                     loadJSONStop(sessionId, id);
                 }
             }
-        });
+        });*/
 
         address.setText(pref.getString("address", null));
         price.setText(pref.getString("price", null));
@@ -99,9 +113,13 @@ public class Parking extends Fragment {
                 ServerResponse resp = response.body();
                 if (resp.getAlert() != "") {
                     Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
-                    FragmentTransaction status = getFragmentManager().beginTransaction();
-                    status.replace(R.id.frame, new Status()).addToBackStack(null);
-                    status.commit();
+                    Status status = new Status();
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    fragmentManager.popBackStack();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.frame, status, "Status")
+                            .addToBackStack("Status")
+                            .commit();
                 }
                 if (resp.getError() != null) {
                     Toast.makeText(getContext(), resp.getError().getMessage() + " - " + resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();

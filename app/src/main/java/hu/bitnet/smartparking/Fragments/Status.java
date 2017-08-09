@@ -4,11 +4,14 @@ import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +41,8 @@ public class Status extends Fragment {
     SharedPreferences pref;
     TextView status_text;
     long count = 0;
+    String sessionId, id;
+    Timer T;
 
     public Status() {
         // Required empty public constructor
@@ -49,23 +54,49 @@ public class Status extends Fragment {
         // Inflate the layout for this fragment
         View status =inflater.inflate(R.layout.fragment_status, container, false);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
-        appbartext.setText("Parking status");
+        appbartext.setText("Parking under process");
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        imageView.setVisibility(View.GONE);
+        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_right);
+        imageView1.setVisibility(View.GONE);
+
         status_text = (TextView)status.findViewById(R.id.status);
         Switch switch1 = (Switch)status.findViewById(R.id.switch1);
 
         pref = getActivity().getPreferences(0);
-        final String sessionId = pref.getString("sessionId", null);
-        final String id = pref.getString("id", null);
+        sessionId = pref.getString("sessionId", null);
+        id = pref.getString("id", null);
 
         loadJSON(sessionId, id);
 
-        switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        AppCompatButton stopparking = (AppCompatButton) status.findViewById(R.id.stop_parking);
+        stopparking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadJSONStop(sessionId, id);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.remove("latitude");
+                editor.remove("longitude");
+                editor.apply();
+                Finish finish = new Finish();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.popBackStack();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, finish, "Finish")
+                        .addToBackStack("Finish")
+                        .commit();
+
+            }
+        });
+
+        /*switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked == true){
                     loadJSONStop(sessionId, id);
                 }
             }
-        });
+        });*/
 
         return status;
     }
@@ -90,7 +121,7 @@ public class Status extends Fragment {
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 ServerResponse resp = response.body();
                 if (resp.getAlert() != "") {
-                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
                 }
                 if (resp.getError() != null) {
                     Toast.makeText(getContext(), resp.getError().getMessage() + " - " + resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
@@ -134,7 +165,7 @@ public class Status extends Fragment {
                     Toast.makeText(getContext(), resp.getError().getMessage() + " - " + resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 }
                 if (resp.getSum() != null) {
-                    Timer T=new Timer();
+                    T=new Timer();
                     count = System.currentTimeMillis()/1000-parseLong(resp.getSum().getStart());
                     T.scheduleAtFixedRate(new TimerTask() {
                         @Override

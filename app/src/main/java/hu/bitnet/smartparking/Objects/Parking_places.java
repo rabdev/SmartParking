@@ -11,10 +11,15 @@ public class Parking_places {
     private String distance;
     private String time;
     private String id;
+    private String latitude, longitude;
+
 
     public String getAddress() { return address; }
     public String getPrice() { return price; }
     public String getDistance() { return distance; }
     public String getTime() { return time; }
     public String getId() { return id; }
+    public String getLatitude() {return latitude;}
+    public String getLongitude() {return longitude;}
+
 }
