@@ -60,7 +60,6 @@ public class Status extends Fragment {
         imageView1.setVisibility(View.GONE);
 
         status_text = (TextView)status.findViewById(R.id.status);
-
         pref = getActivity().getPreferences(0);
         sessionId = pref.getString("sessionId", null);
         id = pref.getString("id", null);

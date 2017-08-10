@@ -6,6 +6,11 @@ package hu.bitnet.smartparking.Objects;
 
 public class Parking_places {
 
+    public Parking_places(String latitude, String longitude){
+        this.latitude=latitude;
+        this.longitude=longitude;
+    }
+
     private String address;
     private String price;
     private String distance;

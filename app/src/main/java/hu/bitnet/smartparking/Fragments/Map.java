@@ -3,14 +3,21 @@ package hu.bitnet.smartparking.Fragments;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -37,8 +44,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.w3c.dom.Document;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
+import hu.bitnet.smartparking.GMapV2Direction;
+import hu.bitnet.smartparking.GMapV2DirectionAsyncTask;
 import hu.bitnet.smartparking.Objects.Constants;
+import hu.bitnet.smartparking.Objects.Parking_places;
 import hu.bitnet.smartparking.R;
 
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
@@ -56,13 +73,14 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     android.location.LocationListener locationlistener;
     LatLng latlng;
     Location location;
-    double latitude;
-    double longitude;
+    Polyline polylin;
+    double latitude, x;
+    double longitude, y;
     public final static int MILLISECONDS_PER_SECOND = 1000;
     public final static int MINUTE = 60 * MILLISECONDS_PER_SECOND;
     SharedPreferences pref;
-    Marker marker;
-    LinearLayout mapcard;
+    public Marker marker;
+    LinearLayout mapcard, navigate;
     TextView mapaddress, mapperprice, mapdistance, maptraffic;
 
 
@@ -75,18 +93,19 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View map = inflater.inflate(R.layout.fragment_map, container, false);
+        final View map = inflater.inflate(R.layout.fragment_map, container, false);
         pref = getActivity().getPreferences(0);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Select parking spot");
 
         mapcard= (LinearLayout) map.findViewById(R.id.map_card);
+        navigate = (LinearLayout) map.findViewById(R.id.navigate);
         mapaddress = (TextView) map.findViewById(R.id.map_address);
         mapperprice = (TextView) map.findViewById(R.id.map_perprice);
         mapdistance = (TextView) map.findViewById(R.id.map_distance);
         maptraffic = (TextView) map.findViewById(R.id.map_traffic);
 
-
+        navigate.setVisibility(View.GONE);
         mapcard.setVisibility(View.GONE);
 
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
@@ -99,6 +118,46 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 getActivity().onBackPressed();
+            }
+        });
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (polylin != null) {
+                    polylin.remove();
+                }
+                if (marker == null) {
+                    Snackbar.make(map, "Nem választottál célt!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    if (location != null) {
+                        double c = location.getLatitude();
+                        double d = location.getLongitude();
+                        LatLng sourcePosition = new LatLng(c, d);
+                        LatLng destPosition = marker.getPosition();
+                        final Handler handler = new Handler() {
+                            public void handleMessage(Message msg) {
+                                try {
+                                    Document doc = (Document) msg.obj;
+                                    GMapV2Direction md = new GMapV2Direction();
+                                    ArrayList<LatLng> directionPoint = md.getDirection(doc);
+                                    PolylineOptions rectLine = new PolylineOptions().width(12).color(Color.rgb(15,192,114));
+
+                                    for (int i = 0; i < directionPoint.size(); i++) {
+                                        rectLine.add(directionPoint.get(i));
+                                    }
+                                    polylin = gmap.addPolyline(rectLine);
+                                    md.getDurationText(doc);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        new GMapV2DirectionAsyncTask(handler, sourcePosition, destPosition, GMapV2Direction.MODE_DRIVING).execute();
+                        navigate.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
 
@@ -135,6 +194,15 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                         .replace(R.id.frame, new Parking())
                         .addToBackStack(null)
                         .commit();
+            }
+        });
+
+        navigate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String uri = String.format("http://maps.google.com/maps?" + "saddr="+latitude+","+longitude+ "&daddr="+x+","+y);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                getContext().startActivity(intent);
             }
         });
 
@@ -259,12 +327,29 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         String lat = pref.getString("latitude", null);
         String lon = pref.getString("longitude", null);
 
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+
         if (lat !=null & lon !=null) {
-            double x = Double.parseDouble(lat);
-            double y = Double.parseDouble(lon);
+            x = Double.parseDouble(lat);
+            y = Double.parseDouble(lon);
             LatLng latLng = new LatLng(x, y);
             marker = gmap.addMarker(new MarkerOptions().position(latLng));
             gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        } else {
+            ArrayList<Parking_places> markersArray = new ArrayList<>();
+            /*markersArray.add(new Parking_places("47.4796768", "19.0157856"));
+            markersArray.add(new Parking_places("47.486985", "19.0157856"));
+            markersArray.add(new Parking_places("47.483324", "19.013419"));
+            markersArray.add(new Parking_places("47.485567", "19.029081"));
+            markersArray.add(new Parking_places("47.491347", "19.0155613"));*/
+
+            for(int i = 0 ; i < markersArray.size() ; i++ ) {
+
+                createMarker(markersArray.get(i).getLatitude(), markersArray.get(i).getLongitude());
+            }
+
+
         }
     }
 
@@ -273,5 +358,15 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     public void onResume() {
         mapView.onResume();
         super.onResume();
+    }
+
+    protected Marker createMarker(String parklat, String parklong) {
+
+        //, String title, String snippet, int iconResID
+        double parklatitude = Double.parseDouble(parklat);
+        double parklongitude = Double.parseDouble(parklong);
+
+        return gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(parklatitude, parklongitude)));
     }
 }
