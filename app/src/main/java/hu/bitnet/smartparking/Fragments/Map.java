@@ -206,7 +206,6 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             }
         });
 
-
         return map;
     }
 
@@ -338,19 +337,33 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         } else {
             ArrayList<Parking_places> markersArray = new ArrayList<>();
-            /*markersArray.add(new Parking_places("47.4796768", "19.0157856"));
-            markersArray.add(new Parking_places("47.486985", "19.0157856"));
-            markersArray.add(new Parking_places("47.483324", "19.013419"));
-            markersArray.add(new Parking_places("47.485567", "19.029081"));
-            markersArray.add(new Parking_places("47.491347", "19.0155613"));*/
+            markersArray.add(new Parking_places("47.4796768", "19.0157856","1124 Budapest, Meredek utca 1"));
+            markersArray.add(new Parking_places("47.486985", "19.0157856","1124 Budapest, Meredek utca 1"));
+            markersArray.add(new Parking_places("47.483324", "19.013419","1124 Budapest, Meredek utca 1"));
+            markersArray.add(new Parking_places("47.485567", "19.029081","1124 Budapest, Meredek utca 1"));
+            markersArray.add(new Parking_places("47.491347", "19.0155613","1124 Budapest, Meredek utca 1"));
 
             for(int i = 0 ; i < markersArray.size() ; i++ ) {
 
-                createMarker(markersArray.get(i).getLatitude(), markersArray.get(i).getLongitude());
+                createMarker(markersArray.get(i).getLatitude(), markersArray.get(i).getLongitude(), markersArray.get(i).getAddress());
             }
 
-
         }
+        gmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker1) {
+                Toast.makeText(getContext(), String.valueOf(marker1.getPosition())
+                        + String.valueOf(marker1.getTitle()), Toast.LENGTH_LONG).show();
+                mapcard.setVisibility(View.VISIBLE);
+                marker1.hideInfoWindow();
+                LatLng position = marker1.getPosition();
+                x = position.latitude;
+                y = position.longitude;
+                marker=marker1;
+                mapaddress.setText(marker1.getTitle());
+                return false;
+            }
+        });
     }
 
 
@@ -360,13 +373,14 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         super.onResume();
     }
 
-    protected Marker createMarker(String parklat, String parklong) {
+    protected Marker createMarker(String parklat, String parklong, String address) {
 
         //, String title, String snippet, int iconResID
         double parklatitude = Double.parseDouble(parklat);
         double parklongitude = Double.parseDouble(parklong);
 
         return gmap.addMarker(new MarkerOptions()
-                .position(new LatLng(parklatitude, parklongitude)));
+                .position(new LatLng(parklatitude, parklongitude))
+                .title(address));
     }
 }

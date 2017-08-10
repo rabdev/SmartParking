@@ -87,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
                                 .replace(R.id.frame, home, "Home")
                                 .commit();
                     } else {
-                        getSupportFragmentManager().popBackStack();
+                        Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
+                        Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
+                        if (finish==null & status ==null) {
+                            getSupportFragmentManager().popBackStack();
+                        }
                     }
                 } else {
                     switch (item.getItemId()) {
@@ -190,11 +194,15 @@ public class MainActivity extends AppCompatActivity {
         index = getSupportFragmentManager().getBackStackEntryCount();
         Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
         Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
-        if (status==null & finish==null){
-            if (index == 0) {
-                super.onBackPressed();
+        if (finish==null){
+            if (status ==null) {
+                if (index == 0) {
+                    super.onBackPressed();
+                } else {
+                    bottomNavigationView.setSelectedItemId(R.id.action_parking);
+                }
             } else {
-                bottomNavigationView.setSelectedItemId(R.id.action_parking);
+                finish();
             }
         }
 

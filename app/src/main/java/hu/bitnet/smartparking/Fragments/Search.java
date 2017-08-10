@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import hu.bitnet.smartparking.Adapters.SearchAdapter;
+import hu.bitnet.smartparking.MainActivity;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.Objects.Parking_places;
 import hu.bitnet.smartparking.R;
@@ -105,6 +107,12 @@ public class Search extends Fragment {
                 }
                 if(resp.getError() != null){
                     Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(Constants.IS_LOGGED_IN,false);
+                    editor.apply();
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
                 if(resp.getAddress() != null){
                     data = new ArrayList<Parking_places>(Arrays.asList(resp.getAddress()));
