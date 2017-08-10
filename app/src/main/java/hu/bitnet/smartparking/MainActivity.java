@@ -1,5 +1,6 @@
 package hu.bitnet.smartparking;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -19,8 +21,9 @@ import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
 import hu.bitnet.smartparking.Fragments.Profile;
 import hu.bitnet.smartparking.Fragments.Settings;
+import hu.bitnet.smartparking.Fragments.Status;
 import hu.bitnet.smartparking.Objects.Constants;
-import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceAutocomplete;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingStatus;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -30,14 +33,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static java.security.AccessController.getContext;
-
 public class MainActivity extends AppCompatActivity {
 
     SharedPreferences preferences;
     BottomNavigationView bottomNavigationView;
     Context context;
     int index;
+    Boolean statusBool;
+    String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +48,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         preferences = getPreferences(0);
         //start();
+        String sessionId = preferences.getString("sessionId", null);
+        String id = preferences.getString("id", null);
 
         if (preferences.getBoolean(Constants.IS_LOGGED_IN, true)) {
             setContentView(R.layout.activity_main);
+            loadJSON(sessionId, id);
         } else {
             Login login = new Login();
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -199,6 +205,47 @@ public class MainActivity extends AppCompatActivity {
         editor.remove("latitude");
         editor.remove("longitude");
         editor.apply();
+    }
+
+    public void loadJSON(String sessionId, String id) {
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceParkingStatus requestInterface = retrofit.create(RequestInterfaceParkingStatus.class);
+        Call<ServerResponse> response = requestInterface.post(sessionId, id);
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+
+                if (resp.getError() != null) {
+                    message = resp.getError().getMessage() + " - " + resp.getError().getMessageDetail();
+                }
+                if (resp.getSum() != null){
+                    Toast.makeText(getApplicationContext(), "Parkolása folyamatban!", Toast.LENGTH_LONG).show();
+                    Status status = new Status();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.frame, status, status.getTag())
+                            .commit();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(ContentValues.TAG, "No response");
+            }
+        });
     }
 
 }

@@ -98,10 +98,10 @@
             android:layout_marginTop="16dp"
             android:textColor="@color/colorPrimary" />
 
-        <Switch
+        <!--Switch
             android:id="@+id/switch1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" /-->
     </LinearLayout>
 
 

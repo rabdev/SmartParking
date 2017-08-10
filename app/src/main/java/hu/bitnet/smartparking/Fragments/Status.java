@@ -10,9 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +31,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.google.android.gms.internal.zzagz.runOnUiThread;
+import static com.google.android.gms.wearable.DataMap.TAG;
 import static java.lang.Long.parseLong;
 
 
@@ -61,7 +60,6 @@ public class Status extends Fragment {
         imageView1.setVisibility(View.GONE);
 
         status_text = (TextView)status.findViewById(R.id.status);
-        Switch switch1 = (Switch)status.findViewById(R.id.switch1);
 
         pref = getActivity().getPreferences(0);
         sessionId = pref.getString("sessionId", null);
@@ -75,10 +73,16 @@ public class Status extends Fragment {
             @Override
             public void onClick(View v) {
                 loadJSONStop(sessionId, id);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 SharedPreferences.Editor editor = pref.edit();
                 editor.remove("latitude");
                 editor.remove("longitude");
                 editor.apply();
+                Log.d(TAG, "time2: "+pref.getString("ParkTime", null));
                 Finish finish = new Finish();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.popBackStack();
@@ -126,8 +130,12 @@ public class Status extends Fragment {
                 if (resp.getError() != null) {
                     Toast.makeText(getContext(), resp.getError().getMessage() + " - " + resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 }
-                if (resp.getAddress() != null) {
-
+                if (resp.getStart() != null) {
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("ParkTime", resp.getTime().toString());
+                    Log.d(TAG, "time: "+resp.getTime().toString());
+                    editor.putString("ParkPrice", resp.getPrice().toString());
+                    editor.apply();
                 }
             }
 
@@ -175,7 +183,7 @@ public class Status extends Fragment {
                                 @Override
                                 public void run()
                                 {
-                                    status_text.setText("count="+count);
+                                    status_text.setText(""+count);
                                     count++;
                                 }
                             });

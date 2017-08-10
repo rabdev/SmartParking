@@ -46,6 +46,7 @@ public class Profile extends Fragment {
                 pref=getActivity().getPreferences(0);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putBoolean(Constants.IS_LOGGED_IN,false);
+                editor.putBoolean("OngoingParkingStatus", false);
                 editor.apply();
                 Intent intent = getActivity().getBaseContext().getPackageManager().getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

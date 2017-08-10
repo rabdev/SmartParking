@@ -142,6 +142,24 @@
 
                     </android.support.design.widget.TextInputLayout>
 
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginLeft="6dp"
+                        android:layout_marginRight="6dp"
+                        android:textColorHint="@color/colorPrimary">
+
+                    <EditText
+                        android:id="@+id/reg_confirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Confirm password"
+                        android:inputType="textPassword"
+                        android:textColor="@color/colorPrimary" />
+
+                    </android.support.design.widget.TextInputLayout>
+
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_register"
                         android:layout_width="match_parent"

@@ -21,7 +21,9 @@ import hu.bitnet.smartparking.MainActivity;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLogin;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceLoginError;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
+import hu.bitnet.smartparking.ServerResponses.ServerResponseError;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -86,7 +88,7 @@ public class Login extends Fragment {
         return login;
     }
 
-    public void loadJSON(String email, String password){
+    public void loadJSON(final String email, final String password){
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -129,11 +131,47 @@ public class Login extends Fragment {
 
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                loadJSONError(email, password);
+                //Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "No response");
             }
         });
 
     }
 
+    public void loadJSONError(String email, String password){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceLoginError requestInterface = retrofit.create(RequestInterfaceLoginError.class);
+        Call<ServerResponseError> response = requestInterface.post(email, password);
+        response.enqueue(new Callback<ServerResponseError>() {
+            @Override
+            public void onResponse(Call<ServerResponseError> call, Response<ServerResponseError> response) {
+                ServerResponseError resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponseError> call, Throwable t) {
+                //Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
+            }
+        });
+
+    }
 }

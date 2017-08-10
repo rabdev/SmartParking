@@ -60,7 +60,7 @@
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
-                <TextView
+                <!--TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -78,7 +78,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/colorAccent"
                     android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold" /-->
 
             </LinearLayout>
         </LinearLayout>
@@ -96,10 +96,10 @@
             android:text="Stop parking"
             android:textColor="@color/colorPrimary" />
 
-        <Switch
+        <!--Switch
             android:id="@+id/switch1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" /-->
     </LinearLayout>
 
 

@@ -117,11 +117,11 @@
         android:paddingBottom="16dp"/>
 
 
-    <Switch
+    <!--Switch
         android:id="@+id/switch1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Switch" />
+        android:text="Switch" /-->
 
 
 </LinearLayout>

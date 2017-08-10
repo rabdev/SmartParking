@@ -6,15 +6,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +57,6 @@ public class Parking extends Fragment {
         imageView1.setVisibility(View.GONE);
         TextView address = (TextView)parking.findViewById(R.id.address);
         TextView price = (TextView)parking.findViewById(R.id.price);
-        Switch switch1 = (Switch)parking.findViewById(R.id.switch1);
 
         pref = getActivity().getPreferences(0);
         sessionId = pref.getString("sessionId", null);
@@ -74,17 +70,6 @@ public class Parking extends Fragment {
 
             }
         });
-
-        /*switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    loadJSONStart(sessionId, id);
-                }
-                if(isChecked == false){
-                    loadJSONStop(sessionId, id);
-                }
-            }
-        });*/
 
         address.setText(pref.getString("address", null));
         price.setText(pref.getString("price", null));

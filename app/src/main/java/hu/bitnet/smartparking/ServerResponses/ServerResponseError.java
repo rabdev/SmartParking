@@ -9,12 +9,12 @@ import hu.bitnet.smartparking.Objects.Profile;
 import hu.bitnet.smartparking.Objects.Sum;
 
 /**
- * Created by Attila on 2017.08.04..
+ * Created by Attila on 2017.08.10..
  */
 
-public class ServerResponse {
+public class ServerResponseError {
 
-    private Profile profile;
+    private Profile[] profile;
     private Error error;
     private String alert;
     private Parking_places parking_places;
@@ -28,7 +28,7 @@ public class ServerResponse {
     private String time;
     private String price;
 
-    public Profile getProfile() { return profile; }
+    public Profile[] getProfile() { return profile; }
     public Error getError() { return error; }
     public String getAlert() { return alert; }
     //public Parking_places getParking_places() { return parking_places; }
