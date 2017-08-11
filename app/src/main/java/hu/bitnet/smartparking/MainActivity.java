@@ -1,14 +1,20 @@
 package hu.bitnet.smartparking;
 
+import android.*;
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     int index;
     Boolean statusBool;
     String message;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,15 @@ public class MainActivity extends AppCompatActivity {
         //start();
         String sessionId = preferences.getString("sessionId", null);
         String id = preferences.getString("id", null);
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+
+
+        }
 
         if (preferences.getBoolean(Constants.IS_LOGGED_IN, true)) {
             setContentView(R.layout.activity_main);
@@ -78,18 +94,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.action_parking) {
+                    FragmentManager fragmentManager0 = getSupportFragmentManager();
                     item.setChecked(item.getItemId() == 0);
                     index = getSupportFragmentManager().getBackStackEntryCount();
                     if (index == 0) {
                         Home home = new Home();
-                        FragmentManager fragmentManager0 = getSupportFragmentManager();
+                        fragmentManager0 = getSupportFragmentManager();
                         fragmentManager0.beginTransaction()
                                 .replace(R.id.frame, home, "Home")
                                 .commit();
                     } else {
                         Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
                         Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
+                        index=index-1;
+                        FragmentManager.BackStackEntry backStackEntry0 = fragmentManager0.getBackStackEntryAt(index);
+                        String tag0 = backStackEntry0.getName();
                         if (finish==null & status ==null) {
+                            getSupportFragmentManager().popBackStack();
+                        } else if (tag0 == "History" || tag0 == "Profile" || tag0 == "Settings"){
                             getSupportFragmentManager().popBackStack();
                         }
                     }
@@ -191,19 +213,32 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onBackPressed() {
+        if (preferences.getString(Constants.longitude, null) != null
+                || preferences.getString(Constants.latitude, null) != null) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(Constants.latitude);
+            editor.remove(Constants.longitude);
+            editor.apply();
+        }
+
         index = getSupportFragmentManager().getBackStackEntryCount();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
         Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
-        if (finish==null){
-            if (status ==null) {
+        index=index-1;
+        FragmentManager.BackStackEntry backStackEntry0 = fragmentManager.getBackStackEntryAt(index);
+        String tag = backStackEntry0.getName();
+        if (finish==null && status==null){
+                index = getSupportFragmentManager().getBackStackEntryCount();
                 if (index == 0) {
                     super.onBackPressed();
                 } else {
                     bottomNavigationView.setSelectedItemId(R.id.action_parking);
                 }
-            } else {
-                finish();
-            }
+        } else if (tag == "History" || tag == "Profile" || tag == "Settings"){
+            bottomNavigationView.setSelectedItemId(R.id.action_parking);
+        } else {
+            finish();
         }
 
     }
@@ -254,6 +289,25 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(ContentValues.TAG, "No response");
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
 }

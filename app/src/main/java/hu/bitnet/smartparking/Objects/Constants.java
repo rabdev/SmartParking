@@ -9,6 +9,7 @@ public class Constants {
     public static final String SERVER_URL = "http://smartparking.digitalwave.hu/app/";
 
     public static final String IS_LOGGED_IN = "isLoggedIn";
+    public static final boolean PAYED = true;
 
     public static final String RSSI = "RSSI";
     public static final String LicensePlate="LicensePlate";

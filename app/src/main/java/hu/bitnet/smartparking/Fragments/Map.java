@@ -20,6 +20,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,6 +121,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
 
         navigate.setVisibility(View.GONE);
         mapcard.setVisibility(View.GONE);
+
 
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
         imageView.setImageResource(R.drawable.ic_navigate);
@@ -334,7 +336,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             double d = location.getLongitude();
             LatLng myloc = new LatLng(c, d);
             gmap.animateCamera(CameraUpdateFactory.newLatLng(myloc));
-            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc, 16));
+            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc, 12));
         }
 
         final String lat = pref.getString("latitude", null);

@@ -67,6 +67,9 @@ public class Parking extends Fragment {
             @Override
             public void onClick(View v) {
                 loadJSONStart(sessionId, id);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putBoolean(String.valueOf(Constants.PAYED),false);
+                editor.apply();
 
             }
         });
