@@ -5,6 +5,7 @@ import hu.bitnet.smartparking.Objects.Error;
 import hu.bitnet.smartparking.Objects.History;
 import hu.bitnet.smartparking.Objects.MQTT;
 import hu.bitnet.smartparking.Objects.Parking_places;
+import hu.bitnet.smartparking.Objects.Place;
 import hu.bitnet.smartparking.Objects.Profile;
 import hu.bitnet.smartparking.Objects.Sum;
 
@@ -17,7 +18,7 @@ public class ServerResponse {
     private Profile profile;
     private Error error;
     private String alert;
-    private Parking_places parking_places;
+    private Parking_places[] parking_places;
     private Parking_places[] addresses;
     private MQTT mqtt;
     private BLE ble;
@@ -27,11 +28,12 @@ public class ServerResponse {
     private String stop;
     private String time;
     private String price;
+    private Place place;
 
     public Profile getProfile() { return profile; }
     public Error getError() { return error; }
     public String getAlert() { return alert; }
-    //public Parking_places getParking_places() { return parking_places; }
+    public Parking_places[] getParking_places() { return parking_places; }
     public Parking_places[] getAddress() { return addresses; }
     public MQTT getMQTT() { return mqtt; }
     public BLE getBLE() { return ble; }
@@ -41,5 +43,6 @@ public class ServerResponse {
     public String getStop() { return stop; }
     public String getTime() { return time; }
     public String getPrice() { return price; }
+    public Place getPlace() { return place; }
 
 }

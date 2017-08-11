@@ -56,6 +56,7 @@ public class Home extends Fragment {
             }
         });
 
+
         AppCompatButton map = (AppCompatButton) home.findViewById(R.id.btn_map);
         map.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +87,19 @@ public class Home extends Fragment {
                         .addToBackStack(null)
                         .commit();
             }
+        });
+
+        AppCompatButton searchByLoc = (AppCompatButton) home.findViewById(R.id.btn_searchbymyloc);
+        searchByLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchByLoc search1 = new SearchByLoc();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame, search1, "Search")
+                        .addToBackStack(null)
+                        .commit();
+            };
         });
 
         return home;

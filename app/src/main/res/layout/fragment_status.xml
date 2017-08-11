@@ -60,7 +60,7 @@
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
-                <!--TextView
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -74,11 +74,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="632 Ft"
+                    android:text=""
                     android:textAlignment="center"
                     android:textColor="@color/colorAccent"
                     android:textSize="22sp"
-                    android:textStyle="bold" /-->
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </LinearLayout>

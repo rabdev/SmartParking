@@ -19,12 +19,21 @@ import android.widget.TextView;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
 
+import static java.lang.Integer.parseInt;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class Finish extends Fragment {
 
     SharedPreferences pref;
+    Integer timeInt;
+    double timeHour;
+    double timeMin;
+    double timeSec;
+    String timeHourString;
+    String timeMinString;
+    String timeSecString;
 
     public Finish() {
         // Required empty public constructor
@@ -52,8 +61,27 @@ public class Finish extends Fragment {
         TextView price = (TextView)finish.findViewById(R.id.amount_pay);
 
         pref = getActivity().getPreferences(0);
-        time.setText(pref.getString("ParkTime", null));
-        price.setText(pref.getString("ParkPrice", null));
+        timeInt = parseInt(pref.getString("ParkTime", null));
+        timeHour = Math.floor(timeInt/3600);
+        timeMin = Math.floor((timeInt-timeHour*3600)/60);
+        timeSec = timeInt-timeHour*3600-timeMin*60;
+        if(timeHour < 10){
+            timeHourString = "0"+Integer.toString((int)timeHour);
+        }else{
+            timeHourString = Integer.toString((int)timeHour);
+        }
+        if(timeMin < 10){
+            timeMinString = "0"+Integer.toString((int)timeMin);
+        }else{
+            timeMinString = Integer.toString((int)timeMin);
+        }
+        if(timeSec < 10){
+            timeSecString = "0"+Integer.toString((int)timeSec);
+        }else{
+            timeSecString = Integer.toString((int)timeSec);
+        }
+        time.setText(timeHourString + ":" + timeMinString + ":" + timeSecString);
+        price.setText(pref.getString("ParkPrice", null) + " Ft");
         pref = this.getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
         final String sms = pref.getString(Constants.SMSBase, "30-763");
         final String licensePlate = pref.getString(Constants.LicensePlate, "ABC-123");

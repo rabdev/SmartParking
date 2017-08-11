@@ -72,7 +72,7 @@ public class Parking extends Fragment {
         });
 
         address.setText(pref.getString("address", null));
-        price.setText(pref.getString("price", null));
+        price.setText(pref.getString("price", null) + " Ft/óra");
 
         return parking;
     }

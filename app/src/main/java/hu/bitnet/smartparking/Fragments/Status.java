@@ -39,9 +39,19 @@ public class Status extends Fragment {
 
     SharedPreferences pref;
     TextView status_text;
+    TextView amount_pay;
     long count = 0;
     String sessionId, id;
     Timer T;
+    double timeHour;
+    double timeMin;
+    double timeSec;
+    String timeHourString;
+    String timeMinString;
+    String timeSecString;
+    String price;
+    double priceDouble;
+    double priceDouble2;
 
     public Status() {
         // Required empty public constructor
@@ -60,6 +70,7 @@ public class Status extends Fragment {
         imageView1.setVisibility(View.GONE);
 
         status_text = (TextView)status.findViewById(R.id.status);
+        amount_pay = (TextView)status.findViewById(R.id.amount_pay);
         pref = getActivity().getPreferences(0);
         sessionId = pref.getString("sessionId", null);
         id = pref.getString("id", null);
@@ -72,6 +83,8 @@ public class Status extends Fragment {
             @Override
             public void onClick(View v) {
                 loadJSONStop(sessionId, id);
+                T.cancel();
+                T = null;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -92,14 +105,6 @@ public class Status extends Fragment {
 
             }
         });
-
-        /*switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    loadJSONStop(sessionId, id);
-                }
-            }
-        });*/
 
         return status;
     }
@@ -172,6 +177,8 @@ public class Status extends Fragment {
                     Toast.makeText(getContext(), resp.getError().getMessage() + " - " + resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 }
                 if (resp.getSum() != null) {
+                    price = resp.getPlace().getPrice().toString();
+                    priceDouble = Double.parseDouble(price);
                     T=new Timer();
                     count = System.currentTimeMillis()/1000-parseLong(resp.getSum().getStart());
                     T.scheduleAtFixedRate(new TimerTask() {
@@ -182,7 +189,27 @@ public class Status extends Fragment {
                                 @Override
                                 public void run()
                                 {
-                                    status_text.setText(""+count);
+                                    timeHour = Math.floor(count/3600);
+                                    timeMin = Math.floor((count-timeHour*3600)/60);
+                                    timeSec = count-timeHour*3600-timeMin*60;
+                                    if(timeHour < 10){
+                                        timeHourString = "0"+Integer.toString((int)timeHour);
+                                    }else{
+                                        timeHourString = Integer.toString((int)timeHour);
+                                    }
+                                    if(timeMin < 10){
+                                        timeMinString = "0"+Integer.toString((int)timeMin);
+                                    }else{
+                                        timeMinString = Integer.toString((int)timeMin);
+                                    }
+                                    if(timeSec < 10){
+                                        timeSecString = "0"+Integer.toString((int)timeSec);
+                                    }else{
+                                        timeSecString = Integer.toString((int)timeSec);
+                                    }
+                                    priceDouble2 = Math.ceil(priceDouble * Double.valueOf(Long.toString(count))/3600.0);
+                                    status_text.setText(timeHourString + ":" + timeMinString + ":" + timeSecString);
+                                    amount_pay.setText(Integer.toString((int)priceDouble2) + " Ft");
                                     count++;
                                 }
                             });

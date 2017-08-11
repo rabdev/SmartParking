@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -50,15 +49,28 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.Arrays;
 
 import hu.bitnet.smartparking.GMapV2Direction;
 import hu.bitnet.smartparking.GMapV2DirectionAsyncTask;
+import hu.bitnet.smartparking.MainActivity;
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.Objects.Parking_places;
 import hu.bitnet.smartparking.R;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceNearest;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingSelect;
+import hu.bitnet.smartparking.ServerResponses.ServerResponse;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.ContentValues.TAG;
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
+import static java.lang.Integer.parseInt;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -82,6 +94,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     public Marker marker;
     LinearLayout mapcard, navigate;
     TextView mapaddress, mapperprice, mapdistance, maptraffic;
+    ArrayList<Parking_places> data;
 
 
     public Map() {
@@ -189,6 +202,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         mapcard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadJSONSelect(pref.getString("sessionId", null), pref.getString("id", null));
                 FragmentManager parking = getActivity().getSupportFragmentManager();
                 parking.beginTransaction()
                         .replace(R.id.frame, new Parking())
@@ -323,45 +337,102 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc, 16));
         }
 
-        String lat = pref.getString("latitude", null);
-        String lon = pref.getString("longitude", null);
+        final String lat = pref.getString("latitude", null);
+        final String lon = pref.getString("longitude", null);
 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        if (lat !=null & lon !=null) {
-            x = Double.parseDouble(lat);
-            y = Double.parseDouble(lon);
-            LatLng latLng = new LatLng(x, y);
-            marker = gmap.addMarker(new MarkerOptions().position(latLng));
-            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-        } else {
-            ArrayList<Parking_places> markersArray = new ArrayList<>();
-            markersArray.add(new Parking_places("47.4796768", "19.0157856","1124 Budapest, Meredek utca 1"));
-            markersArray.add(new Parking_places("47.486985", "19.0157856","1124 Budapest, Meredek utca 1"));
-            markersArray.add(new Parking_places("47.483324", "19.013419","1124 Budapest, Meredek utca 1"));
-            markersArray.add(new Parking_places("47.485567", "19.029081","1124 Budapest, Meredek utca 1"));
-            markersArray.add(new Parking_places("47.491347", "19.0155613","1124 Budapest, Meredek utca 1"));
+        Log.d(TAG, "Lat: "+latitude);
+        Log.d(TAG, "long: "+longitude);
 
-            for(int i = 0 ; i < markersArray.size() ; i++ ) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-                createMarker(markersArray.get(i).getLatitude(), markersArray.get(i).getLongitude(), markersArray.get(i).getAddress());
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceNearest requestInterface = retrofit.create(RequestInterfaceNearest.class);
+        Call<ServerResponse> response= requestInterface.post(pref.getString("sessionId", null), Double.toString(latitude), Double.toString(longitude));
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(Constants.IS_LOGGED_IN,false);
+                    editor.apply();
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+                if(resp.getParking_places() != null){
+                    data = new ArrayList<Parking_places>(Arrays.asList(resp.getParking_places()));
+                    Log.d(TAG, "data: "+data.get(0).getLatitude());
+                    if (lat !=null & lon !=null) {
+                        x = Double.parseDouble(lat);
+                        y = Double.parseDouble(lon);
+                        LatLng latLng = new LatLng(x, y);
+                        marker = gmap.addMarker(new MarkerOptions().position(latLng));
+                        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    } else {
+                        ArrayList<Parking_places> markersArray = new ArrayList<>();
+                        Log.d(TAG, "size: "+data.size());
+                        for (int i = 0; i < data.size(); i++) {
+                            markersArray.add(new Parking_places(data.get(i).getLatitude(), data.get(i).getLongitude(), data.get(i).getAddress()));
+                        }
+
+                        for(int i = 0 ; i < markersArray.size() ; i++ ) {
+
+                            createMarker(markersArray.get(i).getLatitude(), markersArray.get(i).getLongitude(), markersArray.get(i).getAddress());
+                        }
+
+                    }
+                    gmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker1) {
+                            /*Toast.makeText(getContext(), String.valueOf(marker1.getPosition())
+                                    + String.valueOf(marker1.getTitle()), Toast.LENGTH_LONG).show();*/
+
+                            mapcard.setVisibility(View.VISIBLE);
+                            marker1.hideInfoWindow();
+                            LatLng position = marker1.getPosition();
+                            x = position.latitude;
+                            y = position.longitude;
+                            marker=marker1;
+                            mapaddress.setText(marker1.getTitle());
+                            mapperprice.setText(String.format("%.0f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getPrice())) + " Ft/óra");
+                            mapdistance.setText(String.format("%.1f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getDistance())) + " km");
+                            maptraffic.setText(String.format("%.1f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getTime())/60.0) + " mins");
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("id", data.get(parseInt(marker1.getId().substring(1))).getId());
+                            editor.putString("address", data.get(parseInt(marker1.getId().substring(1))).getAddress());
+                            editor.putString("price", String.format("%.0f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getPrice())));
+                            /*editor.putString("host", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getHost());
+                            editor.putString("port", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getPort());
+                            editor.putString("topic", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getTopic());
+                            editor.putString("service", data.get(parseInt(marker1.getId().substring(1))).getBLE().getService());
+                            editor.putString("characteristic", data.get(parseInt(marker1.getId().substring(1))).getBLE().getCharacteristic());*/
+                            editor.apply();
+                            return false;
+                        }
+                    });
+                }
             }
 
-        }
-        gmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker1) {
-                Toast.makeText(getContext(), String.valueOf(marker1.getPosition())
-                        + String.valueOf(marker1.getTitle()), Toast.LENGTH_LONG).show();
-                mapcard.setVisibility(View.VISIBLE);
-                marker1.hideInfoWindow();
-                LatLng position = marker1.getPosition();
-                x = position.latitude;
-                y = position.longitude;
-                marker=marker1;
-                mapaddress.setText(marker1.getTitle());
-                return false;
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
             }
         });
     }
@@ -382,5 +453,55 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         return gmap.addMarker(new MarkerOptions()
                 .position(new LatLng(parklatitude, parklongitude))
                 .title(address));
+    }
+
+    public void loadJSONSelect(String sessionId, String id){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceParkingSelect requestInterface = retrofit.create(RequestInterfaceParkingSelect.class);
+        Call<ServerResponse> response= requestInterface.post(sessionId, id);
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getMQTT() != null){
+                    //Toast.makeText(getContext(), resp.getMQTT().getHost().toString(), Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("host", resp.getMQTT().getHost());
+                    editor.putString("port", resp.getMQTT().getPort());
+                    editor.putString("topic", resp.getMQTT().getTopic());
+                    editor.apply();
+                }
+                if(resp.getBLE() != null){
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("service", resp.getBLE().getService());
+                    editor.putString("characteristic", resp.getBLE().getCharacteristic());
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
+            }
+        });
+
     }
 }

@@ -12,7 +12,7 @@ import retrofit2.http.POST;
 
 public interface RequestInterfaceNearest {
 
-    @POST("nearest-list")
+    @POST("nearest_list")
     @FormUrlEncoded
     Call<ServerResponse> post(@Field("sessionId") String sessionId, @Field("latitude") String latitude, @Field("longitude") String longitude);
 

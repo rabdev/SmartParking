@@ -34,9 +34,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     public void onBindViewHolder(SearchAdapter.ViewHolder viewHolder, int i) {
 
         viewHolder.tv_address.setText(android.get(i).getAddress());
-        viewHolder.tv_priceper.setText(android.get(i).getPrice());
-        viewHolder.tv_km.setText(android.get(i).getDistance()+" km");
-        viewHolder.tv_traffic.setText(android.get(i).getTime()+" min without traffic");
+        viewHolder.tv_priceper.setText(String.format("%.0f", Double.parseDouble(android.get(i).getPrice())) + " Ft/óra");
+        viewHolder.tv_km.setText(String.format("%.1f", Double.parseDouble(android.get(i).getDistance()))+" km");
+        viewHolder.tv_traffic.setText(String.format("%.1f", Double.parseDouble(android.get(i).getTime())/60.0)+" min without traffic");
     }
 
     @Override

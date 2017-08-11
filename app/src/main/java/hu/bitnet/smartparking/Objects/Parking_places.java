@@ -18,6 +18,8 @@ public class Parking_places {
     private String time;
     private String id;
     private String latitude, longitude;
+    private BLE ble;
+    private MQTT mqtt;
 
 
     public String getAddress() { return address; }
@@ -27,5 +29,7 @@ public class Parking_places {
     public String getId() { return id; }
     public String getLatitude() {return latitude;}
     public String getLongitude() {return longitude;}
+    public BLE getBLE() { return ble; }
+    public MQTT getMQTT() { return mqtt; }
 
 }
