@@ -5,12 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +16,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
+import android.widget.Toast;
 
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
@@ -133,6 +129,8 @@ public class Settings extends Fragment {
                 editor.putString(Constants.SettingsDistance,distance2);
                 editor.putString(Constants.SMSBase,smsbase2);
                 editor.apply();
+
+                Toast.makeText(getContext(), "Adatok mentve", Toast.LENGTH_LONG).show();
             }
         });
 
