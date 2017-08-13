@@ -1,11 +1,13 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -115,37 +117,68 @@ public class Search extends Fragment {
                     startActivity(intent);
                 }
                 if(resp.getAddress() != null){
-                    data = new ArrayList<Parking_places>(Arrays.asList(resp.getAddress()));
-                    mAdapter = new SearchAdapter(data);
-                    mRecyclerView.setAdapter(mAdapter);
+                    if(resp.getAddress().length == 0){
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+                        alertDialog.setTitle("Nincs eredmény!");
+                        alertDialog.setMessage("Próbálkozzon más kulcsszóval vagy metódussal!");
+                        alertDialog.setIcon(R.drawable.ic_parking);
 
-                    mAdapter.setOnItemClickListener(new SearchAdapter.ClickListener(){
-                        @Override
-                        public void onItemClick(final int position, View v){
-                            SharedPreferences.Editor editor = pref.edit();
-                            editor.putString("address", data.get(position).getAddress().toString());
-                            editor.putString("price", data.get(position).getPrice().toString());
-                            editor.putString("id", data.get(position).getId().toString());
-                            editor.putString("latitude", data.get(position).getLatitude().toString());
-                            editor.putString("longitude", data.get(position).getLongitude().toString());
-                            editor.putString("distance", data.get(position).getDistance().toString());
-                            editor.putString("time", data.get(position).getTime().toString());
-                            editor.apply();
-                            String id = data.get(position).getId().toString();
-                            String sessionId = pref.getString("sessionId", null);
-                            loadJSONSelect(sessionId, id);
-                            FragmentManager map = getActivity().getSupportFragmentManager();
-                            map.beginTransaction()
-                                    .replace(R.id.frame, new Map())
-                                    .addToBackStack(null)
-                                    .commit();
-                        }
+                        alertDialog.setPositiveButton("Rendben", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Home home1 = new Home();
+                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.frame, home1, "Home")
+                                        .addToBackStack(null)
+                                        .commit();
+                            }
+                        });
 
-                        @Override
-                        public void onItemLongClick(int position, View v) {
-                            Log.d(TAG, "onItemLongClick pos = " + position);
-                        }
-                    });
+                        alertDialog.setNegativeButton("Mégsem", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Home home1 = new Home();
+                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.frame, home1, "Home")
+                                        .addToBackStack(null)
+                                        .commit();
+                            }
+                        });
+
+                        alertDialog.show();
+                    }else{
+                        data = new ArrayList<Parking_places>(Arrays.asList(resp.getAddress()));
+                        mAdapter = new SearchAdapter(data);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                        mAdapter.setOnItemClickListener(new SearchAdapter.ClickListener(){
+                            @Override
+                            public void onItemClick(final int position, View v){
+                                SharedPreferences.Editor editor = pref.edit();
+                                editor.putString("address", data.get(position).getAddress().toString());
+                                editor.putString("price", data.get(position).getPrice().toString());
+                                editor.putString("id", data.get(position).getId().toString());
+                                editor.putString("latitude", data.get(position).getLatitude().toString());
+                                editor.putString("longitude", data.get(position).getLongitude().toString());
+                                editor.putString("distance", data.get(position).getDistance().toString());
+                                editor.putString("time", data.get(position).getTime().toString());
+                                editor.apply();
+                                String id = data.get(position).getId().toString();
+                                String sessionId = pref.getString("sessionId", null);
+                                loadJSONSelect(sessionId, id);
+                                FragmentManager map = getActivity().getSupportFragmentManager();
+                                map.beginTransaction()
+                                        .replace(R.id.frame, new Map())
+                                        .addToBackStack(null)
+                                        .commit();
+                            }
+
+                            @Override
+                            public void onItemLongClick(int position, View v) {
+                                Log.d(TAG, "onItemLongClick pos = " + position);
+                            }
+                        });
+                    }
                 }
             }
 
