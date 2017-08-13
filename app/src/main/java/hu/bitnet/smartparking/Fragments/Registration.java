@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ public class Registration extends Fragment {
     public EditText reg_phone;
     public EditText reg_confirm;
     SharedPreferences preferences;
+    SharedPreferences pref;
 
     public Registration() {
         // Required empty public constructor
@@ -132,6 +134,10 @@ public class Registration extends Fragment {
                     Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 }
                 if(resp.getProfile() != null){
+                    pref = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor1 = pref.edit();
+                    editor1.putString(Constants.LicensePlate, "");
+                    editor1.apply();
                     preferences = getActivity().getPreferences(0);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.clear();
