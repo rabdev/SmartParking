@@ -1,6 +1,7 @@
 package hu.bitnet.smartparking.Fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ public class Login extends Fragment {
     public EditText et_email;
     public EditText et_password;
     SharedPreferences preferences;
+    SharedPreferences pref;
     public Login() {
         // Required empty public constructor
     }
@@ -117,6 +119,15 @@ public class Login extends Fragment {
                     Toast.makeText(getContext(), "Sikeres bejelentkezés", Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
+                    Log.d(TAG, "Pref: "+preferences.getString("email", null));
+                    Log.d(TAG, "Profile: "+resp.getProfile().getEmail().toString());
+                    if(!preferences.getString("email", null).equals(resp.getProfile().getEmail().toString())){
+                        pref = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = pref.edit();
+                        editor1.putString(Constants.LicensePlate, "");
+                        editor1.apply();
+                        Log.d(TAG, "valami"+ preferences.getString(Constants.LicensePlate, null));
+                    }
                     editor.putString("sessionId", resp.getProfile().getSessionId().toString());
                     editor.putString("firstName", resp.getProfile().getFirstName().toString());
                     editor.putString("lastName", resp.getProfile().getLastName().toString());

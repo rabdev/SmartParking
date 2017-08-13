@@ -134,7 +134,14 @@ public class Registration extends Fragment {
                 if(resp.getProfile() != null){
                     preferences = getActivity().getPreferences(0);
                     SharedPreferences.Editor editor = preferences.edit();
+                    editor.clear();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
+                    editor.putString("sessionId", resp.getProfile().getSessionId().toString());
+                    editor.putString("firstName", resp.getProfile().getFirstName().toString());
+                    editor.putString("lastName", resp.getProfile().getLastName().toString());
+                    editor.putString("email", resp.getProfile().getEmail().toString());
+                    editor.putString("phone", resp.getProfile().getPhone().toString());
+                    editor.remove(Constants.LicensePlate);
                     editor.apply();
                     Intent intent = new Intent(getContext(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

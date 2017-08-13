@@ -62,10 +62,12 @@ public class Settings extends Fragment {
         pref = this.getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
         String rssi1=pref.getString(Constants.RSSI,null);
         String licenseplate1 = pref.getString(Constants.LicensePlate,null);
+        Toast.makeText(getContext(), "license: "+licenseplate1, Toast.LENGTH_LONG).show();
         final String distance = pref.getString(Constants.SettingsDistance,null);
         String smsbase = pref.getString(Constants.SMSBase,null);
 
-        if (licenseplate1==null|| licenseplate1.isEmpty()){
+        if (licenseplate1==null|| licenseplate1.isEmpty() || licenseplate1.equals("")){
+            licenseplate.setText("");
             showDialog();
         } else {
             licenseplate.setText(pref.getString(Constants.LicensePlate,""));
@@ -172,6 +174,7 @@ public class Settings extends Fragment {
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString(Constants.LicensePlate,et_lp1);
                     editor.apply();
+                    licenseplate.setText(et_lp1);
                     progress.setVisibility(View.GONE);
                     dialog.dismiss();
 

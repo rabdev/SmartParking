@@ -19,4 +19,9 @@ public class Constants {
     public static final String latitude="latitude";
     public static final String longitude="longitude";
 
+    public static final String username="username";
+    public static final String firstname="firstname";
+    public static final String lastname="lastname";
+    public static final String phone="phone";
+
 }
