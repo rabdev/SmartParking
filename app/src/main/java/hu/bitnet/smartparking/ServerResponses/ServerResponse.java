@@ -29,6 +29,8 @@ public class ServerResponse {
     private String time;
     private String price;
     private Place place;
+    private String free;
+    private String devaddr;
 
     public Profile getProfile() { return profile; }
     public Error getError() { return error; }
@@ -44,5 +46,7 @@ public class ServerResponse {
     public String getTime() { return time; }
     public String getPrice() { return price; }
     public Place getPlace() { return place; }
+    public String getFree() { return free; }
+    public String getDevaddr() { return devaddr; }
 
 }

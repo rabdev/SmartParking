@@ -104,8 +104,10 @@ public class Search extends Fragment {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 ServerResponse resp = response.body();
-                if(resp.getAlert() != ""){
-                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                if(resp.getAlert() != null){
+                    if(resp.getAlert() != "") {
+                        Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                    }
                 }
                 if(resp.getError() != null){
                     Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
@@ -166,11 +168,6 @@ public class Search extends Fragment {
                                 String id = data.get(position).getId().toString();
                                 String sessionId = pref.getString("sessionId", null);
                                 loadJSONSelect(sessionId, id);
-                                FragmentManager map = getActivity().getSupportFragmentManager();
-                                map.beginTransaction()
-                                        .replace(R.id.frame, new Map())
-                                        .addToBackStack(null)
-                                        .commit();
                             }
 
                             @Override
@@ -230,6 +227,11 @@ public class Search extends Fragment {
                     editor.putString("characteristic", resp.getBLE().getCharacteristic());
                     editor.apply();
                 }
+                FragmentManager map = getActivity().getSupportFragmentManager();
+                map.beginTransaction()
+                        .replace(R.id.frame, new Map())
+                        .addToBackStack(null)
+                        .commit();
             }
 
             @Override

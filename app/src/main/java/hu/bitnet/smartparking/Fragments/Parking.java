@@ -3,6 +3,7 @@ package hu.bitnet.smartparking.Fragments;
 
 import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+
 import hu.bitnet.smartparking.Objects.Constants;
 import hu.bitnet.smartparking.R;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingSelect;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingStart;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingStop;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
@@ -28,6 +32,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -37,6 +43,12 @@ public class Parking extends Fragment {
     AppCompatButton startparking;
     String sessionId, id;
     View parking, stop;
+    Timer T;
+    boolean isGPSEnabled = false;
+    boolean isNetworkEnabled = false;
+    boolean canGetLocation = false;
+
+    LocationManager locationManager;
 
     public Parking() {
         // Required empty public constructor
@@ -159,4 +171,55 @@ public class Parking extends Fragment {
             }
         });
     }
+
+    public void loadJSONSelect(String sessionId, String id){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceParkingSelect requestInterface = retrofit.create(RequestInterfaceParkingSelect.class);
+        Call<ServerResponse> response= requestInterface.post(sessionId, id);
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getMQTT() != null){
+                    //Toast.makeText(getContext(), resp.getMQTT().getHost().toString(), Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("host", resp.getMQTT().getHost());
+                    editor.putString("port", resp.getMQTT().getPort());
+                    editor.putString("topic", resp.getMQTT().getTopic());
+                    editor.apply();
+                }
+                if(resp.getBLE() != null){
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("service", resp.getBLE().getService());
+                    editor.putString("characteristic", resp.getBLE().getCharacteristic());
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
+            }
+        });
+
+    }
+
 }

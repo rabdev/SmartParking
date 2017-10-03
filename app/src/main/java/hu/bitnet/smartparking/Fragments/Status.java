@@ -179,42 +179,44 @@ public class Status extends Fragment {
                 if (resp.getSum() != null) {
                     price = resp.getPlace().getPrice().toString();
                     priceDouble = Double.parseDouble(price);
-                    T=new Timer();
-                    count = System.currentTimeMillis()/1000-parseLong(resp.getSum().getStart());
-                    T.scheduleAtFixedRate(new TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(new Runnable()
-                            {
-                                @Override
-                                public void run()
+                    if(T == null){
+                        T=new Timer();
+                        count = System.currentTimeMillis()/1000-parseLong(resp.getSum().getStart());
+                        T.scheduleAtFixedRate(new TimerTask() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable()
                                 {
-                                    timeHour = Math.floor(count/3600);
-                                    timeMin = Math.floor((count-timeHour*3600)/60);
-                                    timeSec = count-timeHour*3600-timeMin*60;
-                                    if(timeHour < 10){
-                                        timeHourString = "0"+Integer.toString((int)timeHour);
-                                    }else{
-                                        timeHourString = Integer.toString((int)timeHour);
+                                    @Override
+                                    public void run()
+                                    {
+                                        timeHour = Math.floor(count/3600);
+                                        timeMin = Math.floor((count-timeHour*3600)/60);
+                                        timeSec = count-timeHour*3600-timeMin*60;
+                                        if(timeHour < 10){
+                                            timeHourString = "0"+Integer.toString((int)timeHour);
+                                        }else{
+                                            timeHourString = Integer.toString((int)timeHour);
+                                        }
+                                        if(timeMin < 10){
+                                            timeMinString = "0"+Integer.toString((int)timeMin);
+                                        }else{
+                                            timeMinString = Integer.toString((int)timeMin);
+                                        }
+                                        if(timeSec < 10){
+                                            timeSecString = "0"+Integer.toString((int)timeSec);
+                                        }else{
+                                            timeSecString = Integer.toString((int)timeSec);
+                                        }
+                                        priceDouble2 = Math.ceil(priceDouble * Double.valueOf(Long.toString(count))/3600.0);
+                                        status_text.setText(timeHourString + ":" + timeMinString + ":" + timeSecString);
+                                        amount_pay.setText(Integer.toString((int)priceDouble2) + " Ft");
+                                        count++;
                                     }
-                                    if(timeMin < 10){
-                                        timeMinString = "0"+Integer.toString((int)timeMin);
-                                    }else{
-                                        timeMinString = Integer.toString((int)timeMin);
-                                    }
-                                    if(timeSec < 10){
-                                        timeSecString = "0"+Integer.toString((int)timeSec);
-                                    }else{
-                                        timeSecString = Integer.toString((int)timeSec);
-                                    }
-                                    priceDouble2 = Math.ceil(priceDouble * Double.valueOf(Long.toString(count))/3600.0);
-                                    status_text.setText(timeHourString + ":" + timeMinString + ":" + timeSecString);
-                                    amount_pay.setText(Integer.toString((int)priceDouble2) + " Ft");
-                                    count++;
-                                }
-                            });
-                        }
-                    }, 1000, 1000);
+                                });
+                            }
+                        }, 1000, 1000);
+                    }
                 }
             }
 

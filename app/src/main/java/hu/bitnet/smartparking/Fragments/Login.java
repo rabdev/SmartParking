@@ -72,6 +72,7 @@ public class Login extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
                         .replace(R.id.mainframe, registration, registration.getTag())
+                        .addToBackStack("Login")
                         .commit();
             }
         });
@@ -117,16 +118,20 @@ public class Login extends Fragment {
                 }
                 if(resp.getProfile() != null){
                     Toast.makeText(getContext(), "Sikeres bejelentkezés", Toast.LENGTH_LONG).show();
+                    final String PREFS_NAME = "PrefsFile";
+                    SharedPreferences settingsFirst = getActivity().getSharedPreferences(PREFS_NAME, 0);
+                    settingsFirst.edit().putBoolean("firstTime", false).commit();
+                    preferences = getActivity().getPreferences(0);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
-                    Log.d(TAG, "Pref: "+preferences.getString("email", null));
-                    Log.d(TAG, "Profile: "+resp.getProfile().getEmail().toString());
-                    if(!preferences.getString("email", null).equals(resp.getProfile().getEmail().toString())){
-                        pref = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor1 = pref.edit();
-                        editor1.putString(Constants.LicensePlate, "");
-                        editor1.apply();
-                        Log.d(TAG, "valami"+ preferences.getString(Constants.LicensePlate, null));
+                    editor.apply();
+                    if(preferences.getString("email", null) != null){
+                        if(!preferences.getString("email", null).equals(resp.getProfile().getEmail().toString())){
+                            pref = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor1 = pref.edit();
+                            editor1.putString(Constants.LicensePlate, "");
+                            editor1.apply();
+                        }
                     }
                     editor.putString("sessionId", resp.getProfile().getSessionId().toString());
                     editor.putString("firstName", resp.getProfile().getFirstName().toString());

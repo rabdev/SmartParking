@@ -49,7 +49,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         viewHolder.tv_priceper.setText(android.get(i).getPlace().getPrice().toString()+" Ft/óra");
         viewHolder.tv_price.setText(android.get(i).getSum().getPrice().toString()+ " Ft");
         viewHolder.tv_timestamp.setText(formatter.format(calendar.getTime()).toString());
-        viewHolder.tv_time.setText(" ("+android.get(i).getSum().getTime()+ " perc)");
+        viewHolder.tv_time.setText(" ("+Math.ceil(Double.parseDouble(android.get(i).getSum().getTime())/60.0)+ " perc)");
     }
 
     @Override

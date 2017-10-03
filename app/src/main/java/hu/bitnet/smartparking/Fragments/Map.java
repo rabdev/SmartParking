@@ -2,7 +2,20 @@ package hu.bitnet.smartparking.Fragments;
 
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -11,16 +24,19 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +67,10 @@ import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
 import hu.bitnet.smartparking.GMapV2Direction;
 import hu.bitnet.smartparking.GMapV2DirectionAsyncTask;
@@ -60,6 +80,7 @@ import hu.bitnet.smartparking.Objects.Parking_places;
 import hu.bitnet.smartparking.R;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceNearest;
 import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingSelect;
+import hu.bitnet.smartparking.RequestInterfaces.RequestInterfaceParkingState;
 import hu.bitnet.smartparking.ServerResponses.ServerResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -80,6 +101,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     public MapView mapView;
+    public static View map;
     public GoogleMap gmap;
     private GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
@@ -91,11 +113,23 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     double longitude, y;
     public final static int MILLISECONDS_PER_SECOND = 1000;
     public final static int MINUTE = 60 * MILLISECONDS_PER_SECOND;
-    SharedPreferences pref;
+    static SharedPreferences pref;
+    static SharedPreferences preferences;
     public Marker marker;
     LinearLayout mapcard, navigate;
     TextView mapaddress, mapperprice, mapdistance, maptraffic;
     ArrayList<Parking_places> data;
+    public static Timer Tmap;
+    float[] results = new float[3];
+    private final static int REQUEST_ENABLE_BT = 1;
+    public static BluetoothGatt mBluetoothGatt;
+    public static BluetoothDevice device;
+    public static BluetoothLeScanner scanner;
+    public String lat, lon;
+    public UUID service;
+    Integer distance;
+    static Integer RSSI;
+    ArrayList filters = new ArrayList();
 
 
     public Map() {
@@ -107,7 +141,8 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View map = inflater.inflate(R.layout.fragment_map, container, false);
+        map = inflater.inflate(R.layout.fragment_map, container, false);
+        FragmentActivity activity = (FragmentActivity)map.getContext();
         pref = getActivity().getPreferences(0);
         TextView appbartext = (TextView) getActivity().findViewById(R.id.appbar_text);
         appbartext.setText("Select parking spot");
@@ -122,11 +157,18 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         navigate.setVisibility(View.GONE);
         mapcard.setVisibility(View.GONE);
 
+        lat = pref.getString("latitude", null);
+        lon = pref.getString("longitude", null);
+        Log.d(TAG, "service: "+pref.getString("service", null));
+
+        if(lon != null && lat != null){
+            checkForSlot();
+        }
 
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.appbar_right);
         imageView.setImageResource(R.drawable.ic_navigate);
         imageView.setVisibility(View.VISIBLE);
-        ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
+        final ImageView imageView1 = (ImageView) getActivity().findViewById(R.id.appbar_left);
         imageView1.setImageResource(R.drawable.ic_back);
         imageView1.setVisibility(View.VISIBLE);
         imageView1.setOnClickListener(new View.OnClickListener() {
@@ -191,9 +233,6 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         mLocationRequest.setFastestInterval(15 * MILLISECONDS_PER_SECOND);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        String lat = pref.getString("latitude", null);
-        String lon = pref.getString("longitude", null);
-
         if (lat!= null & lon !=null){
             mapaddress.setText(pref.getString("address", null));
             mapperprice.setText(pref.getString("price", null) + " Ft/óra");
@@ -206,6 +245,10 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             public void onClick(View v) {
                 loadJSONSelect(pref.getString("sessionId", null), pref.getString("id", null));
                 FragmentManager parking = getActivity().getSupportFragmentManager();
+                Tmap.cancel();
+                Tmap.purge();
+                Tmap = null;
+                scanner.stopScan(mScanCallback);
                 parking.beginTransaction()
                         .replace(R.id.frame, new Parking())
                         .addToBackStack(null)
@@ -216,6 +259,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
         navigate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Tmap.cancel();
                 String uri = String.format("http://maps.google.com/maps?" + "saddr="+latitude+","+longitude+ "&daddr="+x+","+y);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
                 getContext().startActivity(intent);
@@ -261,6 +305,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "MAPREADY");
         gmap = googleMap;
         gmap.setMyLocationEnabled(true);
         gmap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -320,6 +365,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             }
         };
         location = locationManager.getLastKnownLocation(bestProvider);
+        if (location == null) location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location == null) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
@@ -329,6 +375,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                 }, 10);
                 return;
             }
+            Log.d(TAG, "loc null");
             locationManager.requestLocationUpdates(bestProvider, 0, 0, locationlistener);
             return;
         } else {
@@ -339,8 +386,8 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc, 12));
         }
 
-        final String lat = pref.getString("latitude", null);
-        final String lon = pref.getString("longitude", null);
+        //final String lat = pref.getString("latitude", null);
+        //final String lon = pref.getString("longitude", null);
 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
@@ -370,12 +417,19 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                 }
                 if(resp.getError() != null){
                     Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(Constants.IS_LOGGED_IN,false);
-                    editor.apply();
-                    Intent intent = new Intent(getContext(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    if(resp.getError().getMessage().indexOf("munkamenet") > -1){
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putBoolean(Constants.IS_LOGGED_IN,false);
+                        editor.apply();
+                        if(Map.Tmap != null){
+                            Map.Tmap.cancel();
+                            Map.Tmap.purge();
+                            Map.Tmap = null;
+                        }
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
                 }
                 if(resp.getParking_places() != null){
                     data = new ArrayList<Parking_places>(Arrays.asList(resp.getParking_places()));
@@ -419,15 +473,20 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                             editor.putString("id", data.get(parseInt(marker1.getId().substring(1))).getId());
                             editor.putString("address", data.get(parseInt(marker1.getId().substring(1))).getAddress());
                             editor.putString("price", String.format("%.0f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getPrice())));
+                            editor.putString("latitude", String.format("%.0f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getLatitude())));
+                            editor.putString("longitude", String.format("%.0f", Double.parseDouble(data.get(parseInt(marker1.getId().substring(1))).getLatitude())));
                             /*editor.putString("host", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getHost());
                             editor.putString("port", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getPort());
                             editor.putString("topic", data.get(parseInt(marker1.getId().substring(1))).getMQTT().getTopic());
                             editor.putString("service", data.get(parseInt(marker1.getId().substring(1))).getBLE().getService());
                             editor.putString("characteristic", data.get(parseInt(marker1.getId().substring(1))).getBLE().getCharacteristic());*/
                             editor.apply();
+                            checkForSlot();
                             return false;
                         }
                     });
+                }else{
+                    Log.d(TAG, "valami");
                 }
             }
 
@@ -493,6 +552,7 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
                 if(resp.getBLE() != null){
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString("service", resp.getBLE().getService());
+                    editor.putString("devaddr", resp.getBLE().getDevaddr());
                     editor.putString("characteristic", resp.getBLE().getCharacteristic());
                     editor.apply();
                 }
@@ -505,5 +565,232 @@ public class Map extends Fragment implements LocationListener, OnMapReadyCallbac
             }
         });
 
+    }
+
+    public void loadJSONState(String sessionId, String id){
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(Constants.SERVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RequestInterfaceParkingState requestInterface = retrofit.create(RequestInterfaceParkingState.class);
+        Call<ServerResponse> response= requestInterface.post(sessionId, id);
+        response.enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                ServerResponse resp = response.body();
+                if(resp.getAlert() != ""){
+                    Toast.makeText(getContext(), resp.getAlert(), Toast.LENGTH_LONG).show();
+                }
+                if(resp.getError() != null){
+                    Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
+                }
+                if(resp.getFree() != null){
+                    if(resp.getFree().equals("1")){
+                        Log.d(TAG, "A parkolóhely szabad");
+                    }else{
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+                        alertDialog.setTitle("Foglalt");
+                        alertDialog.setMessage("A kiválasztott parkolóhelyet elfoglalták.");
+                        alertDialog.setIcon(R.drawable.ic_parking);
+
+                        alertDialog.setPositiveButton("Új választása", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Home home = new Home();
+                                FragmentManager fragmentManager0 = getActivity().getSupportFragmentManager();
+                                fragmentManager0.beginTransaction()
+                                        .replace(R.id.frame, home, "Home")
+                                        .commit();
+                            }
+                        });
+
+                        alertDialog.setNegativeButton("Mégsem", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                getActivity().finish();
+                            }
+                        });
+
+                        alertDialog.show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Hiba a hálózati kapcsolatban. Kérjük, ellenőrizze, hogy csatlakozik-e hálózathoz.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No response");
+            }
+        });
+
+    }
+
+    public void scanForDevice(){
+        BluetoothManager bm = (BluetoothManager)getContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter mBluetoothAdapter = bm.getAdapter();
+
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
+        UUID service = UUID.fromString(pref.getString("service", null));
+        ParcelUuid uuid = new ParcelUuid(service);
+
+        ScanFilter filter = new ScanFilter.Builder()
+                .setServiceUuid(uuid)
+                //.setDeviceAddress("70:28:8B:40:8E:AA")
+                .build();
+
+        filters.add(filter);
+
+        ScanSettings settings = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .setReportDelay(1000)
+                .build();
+
+        scanner = mBluetoothAdapter.getBluetoothLeScanner();
+        // scan for devices
+        scanner.startScan(filters, settings, mScanCallback);
+
+    }
+
+    public static final ScanCallback mScanCallback = new ScanCallback() {
+
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            // get the discovered device as you wish
+            // this will trigger each time a new device is found
+            BluetoothDevice device = result.getDevice();
+            Log.d(TAG, "device: "+device.getAddress());
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            if (!results.isEmpty()) {
+                for(int i = 0; i < results.size(); i++){
+                    ScanResult result = results.get(i);
+                    device = result.getDevice();
+                    String deviceAddress = device.getAddress();
+                    String deviceName = device.getName();
+                    Log.d(TAG, "device: "+deviceAddress+" deviceName: "+deviceName);
+                    scanner.stopScan(mScanCallback);
+                }
+                BluetoothManager bm = (BluetoothManager)MainActivity.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
+                BluetoothAdapter mBluetoothAdapter = bm.getAdapter();
+                //BluetoothDevice deviceRemote = mBluetoothAdapter.getRemoteDevice(deviceAddress);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mBluetoothGatt = device.connectGatt(MainActivity.getAppContext(), true, mGattCallback, BluetoothDevice.TRANSPORT_AUTO);
+                }
+                // Device detected, we can automatically connect to it and stop the scan
+            }else{
+                Log.d(TAG, "Nincs eszköz");
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            System.out.println("BLE// onScanFailed");
+            Log.e("Scan Failed", "Error Code: " + errorCode);
+        }
+    };
+
+    private static final BluetoothGattCallback mGattCallback =
+            new BluetoothGattCallback() {
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status,
+                                                    int newState) {
+                    String intentAction;
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        Log.i(TAG, "Connected to GATT server.");
+                        Log.i(TAG, "Attempting to start service discovery:" +
+                                mBluetoothGatt.discoverServices());
+                        scanner.stopScan(mScanCallback);
+                        mBluetoothGatt.readRemoteRssi();
+                        mBluetoothGatt.disconnect();
+                        mBluetoothGatt.close();
+
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        Log.i(TAG, "Disconnected from GATT server.");
+                        mBluetoothGatt.discoverServices();
+                        mBluetoothGatt.readRemoteRssi();
+                        mBluetoothGatt.close();
+                        scanner.stopScan(mScanCallback);
+                    }
+                }
+
+                @Override
+                // New services discovered
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        Log.d(TAG, "GattSuccess");
+                    } else {
+                        Log.w(TAG, "onServicesDiscovered received: " + status);
+                    }
+                }
+
+                @Override
+                // Result of a characteristic read operation
+                public void onCharacteristicRead(BluetoothGatt gatt,
+                                                 BluetoothGattCharacteristic characteristic,
+                                                 int status) {
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        Log.d(TAG, "Characteristic");
+                    }
+                }
+
+                public void onReadRemoteRssi(BluetoothGatt gatt,
+                                             int rssi,
+                                             int status) {
+                    FragmentActivity activity = (FragmentActivity)map.getContext();
+                    if(activity.getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE) != null){
+                        preferences = MainActivity.getAppContext().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
+                        RSSI = Integer.parseInt(pref.getString(Constants.RSSI, "-95"));
+                    }else{
+                        RSSI = -95;
+                    }
+                    if(rssi >= RSSI){
+                        FragmentManager parking = activity.getSupportFragmentManager();
+                        parking.beginTransaction()
+                                .replace(R.id.frame, new Parking())
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }
+            };
+
+    public void checkForSlot() {
+
+        Tmap=new Timer();
+        Tmap.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                loadJSONState(pref.getString("sessionId", null), pref.getString("id", null));
+                lat = pref.getString("latitude", null);
+                lon = pref.getString("longitude", null);
+                if(lat != null && lon != null && location != null){
+                    if(getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE) != null){
+                        preferences = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
+                        distance = Integer.parseInt(pref.getString(Constants.SettingsDistance, "2500"));
+                    }else{
+                        distance = 2500;
+                    }
+                    Location.distanceBetween(Double.parseDouble(lat), Double.parseDouble(lon), location.getLatitude(), location.getLongitude(), results);
+                    Log.d(TAG, "Distance: "+results[0]);
+                    if(results[0] > distance){
+                        loadJSONSelect(pref.getString("sessionId", null), pref.getString("id", null));
+                        //scanForDevice(pref.getString("devaddr", null), pref.getString("service", null), pref.getString("characteristic", null));
+                        scanForDevice();
+                    }
+                }
+            }
+        }, 1000, 10000);
     }
 }

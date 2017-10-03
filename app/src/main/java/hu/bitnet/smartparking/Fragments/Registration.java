@@ -133,15 +133,19 @@ public class Registration extends Fragment {
                 if(resp.getError() != null){
                     Toast.makeText(getContext(), resp.getError().getMessage()+" - "+resp.getError().getMessageDetail(), Toast.LENGTH_SHORT).show();
                 }
-                if(resp.getProfile() != null){
+                if(resp.getProfile().getEmail() != null){
                     pref = getActivity().getSharedPreferences(Constants.RSSI, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor1 = pref.edit();
                     editor1.putString(Constants.LicensePlate, "");
                     editor1.apply();
                     preferences = getActivity().getPreferences(0);
+                    final String PREFS_NAME = "PrefsFile";
+                    SharedPreferences settingsFirst = getActivity().getSharedPreferences(PREFS_NAME, 0);
+                    settingsFirst.edit().putBoolean("firstTime", false).commit();
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.clear();
                     editor.putBoolean(Constants.IS_LOGGED_IN, true);
+                    editor.putBoolean("registry", true);
                     editor.putString("sessionId", resp.getProfile().getSessionId().toString());
                     editor.putString("firstName", resp.getProfile().getFirstName().toString());
                     editor.putString("lastName", resp.getProfile().getLastName().toString());
