@@ -1,11 +1,10 @@
 package hu.bitnet.smartparking;
 
+import android.*;
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import android.widget.Toast;
 import hu.bitnet.smartparking.Fragments.History;
 import hu.bitnet.smartparking.Fragments.Home;
 import hu.bitnet.smartparking.Fragments.Login;
-import hu.bitnet.smartparking.Fragments.Map;
 import hu.bitnet.smartparking.Fragments.Profile;
 import hu.bitnet.smartparking.Fragments.Settings;
 import hu.bitnet.smartparking.Fragments.Status;
@@ -45,20 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
     SharedPreferences preferences;
     BottomNavigationView bottomNavigationView;
-    //Context context;
+    Context context;
     int index;
     Boolean statusBool;
     String message;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    private BluetoothAdapter mBluetoothAdapter;
-    private final static int REQUEST_ENABLE_BT = 1;
-
-    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity.context = getApplicationContext();
         setContentView(R.layout.activity_main);
         preferences = getPreferences(0);
         //start();
@@ -70,29 +63,8 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_CODE_ASK_PERMISSIONS);
-        }
 
-        final BluetoothManager bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        // Ensures Bluetooth is available on the device and it is enabled. If not,
-        // displays a dialog requesting user permission to enable Bluetooth.
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-        final String PREFS_NAME = "PrefsFile";
-
-        SharedPreferences settingsFirst = getSharedPreferences(PREFS_NAME, 0);
-
-        if (settingsFirst.getBoolean("firstTime", true)) {
-            //the app is being launched for first time, do something
-            Login login = new Login();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.mainframe, login, login.getTag())
-                    .commit();
         }
 
         if (preferences.getBoolean(Constants.IS_LOGGED_IN, true)) {
@@ -122,14 +94,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.action_parking) {
-                    if(Map.Tmap != null){
-                        Map.Tmap.cancel();
-                        Map.Tmap.purge();
-                        Map.Tmap = null;
-                    }
-                    if(Map.scanner != null) {
-                        Map.scanner.stopScan(Map.mScanCallback);
-                    }
                     FragmentManager fragmentManager0 = getSupportFragmentManager();
                     item.setChecked(item.getItemId() == 0);
                     index = getSupportFragmentManager().getBackStackEntryCount();
@@ -154,14 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     switch (item.getItemId()) {
                         case R.id.action_history:
-                            if(Map.Tmap != null){
-                                Map.Tmap.cancel();
-                                Map.Tmap.purge();
-                                Map.Tmap = null;
-                            }
-                            if(Map.scanner != null) {
-                                Map.scanner.stopScan(Map.mScanCallback);
-                            }
                             item.setChecked(item.getItemId() == 1);
                             History history1 = new History();
                             FragmentManager fragmentManager1 = getSupportFragmentManager();
@@ -190,14 +146,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case R.id.action_profile:
-                            if(Map.Tmap != null){
-                                Map.Tmap.cancel();
-                                Map.Tmap.purge();
-                                Map.Tmap = null;
-                            }
-                            if(Map.scanner != null) {
-                                Map.scanner.stopScan(Map.mScanCallback);
-                            }
                             item.setChecked(item.getItemId() == 2);
                             Profile profile1 = new Profile();
                             FragmentManager fragmentManager2 = getSupportFragmentManager();
@@ -226,14 +174,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case R.id.action_settings:
-                            if(Map.Tmap != null){
-                                Map.Tmap.cancel();
-                                Map.Tmap.purge();
-                                Map.Tmap = null;
-                            }
-                            if(Map.scanner != null) {
-                                Map.scanner.stopScan(Map.mScanCallback);
-                            }
                             item.setChecked(item.getItemId() == 3);
                             Settings settings1 = new Settings();
                             FragmentManager fragmentManager3 = getSupportFragmentManager();
@@ -273,14 +213,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onBackPressed() {
-        if(Map.Tmap != null) {
-            Map.Tmap.cancel();
-            Map.Tmap.purge();
-            Map.Tmap = null;
-        }
-        if(Map.scanner != null) {
-            Map.scanner.stopScan(Map.mScanCallback);
-        }
         if (preferences.getString(Constants.longitude, null) != null
                 || preferences.getString(Constants.latitude, null) != null) {
             SharedPreferences.Editor editor = preferences.edit();
@@ -294,24 +226,21 @@ public class MainActivity extends AppCompatActivity {
         Fragment status = getSupportFragmentManager().findFragmentByTag("Status");
         Fragment finish = getSupportFragmentManager().findFragmentByTag("Finish");
         index=index-1;
-        if(index == -1){
-            finish();
-        }else{
-            FragmentManager.BackStackEntry backStackEntry0 = fragmentManager.getBackStackEntryAt(index);
-            String tag = backStackEntry0.getName();
-            if (finish==null && status==null){
+        FragmentManager.BackStackEntry backStackEntry0 = fragmentManager.getBackStackEntryAt(index);
+        String tag = backStackEntry0.getName();
+        if (finish==null && status==null){
                 index = getSupportFragmentManager().getBackStackEntryCount();
                 if (index == 0) {
                     super.onBackPressed();
                 } else {
                     bottomNavigationView.setSelectedItemId(R.id.action_parking);
                 }
-            } else if (tag == "History" || tag == "Profile" || tag == "Settings"){
-                bottomNavigationView.setSelectedItemId(R.id.action_parking);
-            } else {
-                finish();
-            }
+        } else if (tag == "History" || tag == "Profile" || tag == "Settings"){
+            bottomNavigationView.setSelectedItemId(R.id.action_parking);
+        } else {
+            finish();
         }
+
     }
     public void start() {
         SharedPreferences.Editor editor = preferences.edit();
@@ -379,10 +308,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    public static Context getAppContext() {
-        return MainActivity.context;
     }
 
 }
